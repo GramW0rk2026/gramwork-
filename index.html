@@ -1121,10 +1121,26 @@
     const expires = new Date(Date.now() + 5 * 60 * 1000).toISOString();
     await sb.from('otps').delete().eq('phone', phone);
     const { error } = await sb.from('otps').insert({ phone, code, expires_at: expires });
-    showLoad('login-loading', false);
-    if (error) { showErr('login-error', 'خطا در ارسال کد — دوباره تلاش کن'); return; }
+    if (error) { showLoad('login-loading', false); showErr('login-error', 'خطا در ارسال کد — دوباره تلاش کن'); return; }
 
-    alert('کد تأیید شما: ' + code + '\n(بعداً از طریق SMS ارسال میشه)');
+    try {
+      const smsRes = await fetch('/.netlify/functions/send-otp-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, code })
+      });
+      const smsData = await smsRes.json();
+      showLoad('login-loading', false);
+      if (!smsData.success) {
+        showErr('login-error', 'خطا در ارسال پیامک — دوباره تلاش کن');
+        return;
+      }
+    } catch (e) {
+      showLoad('login-loading', false);
+      showErr('login-error', 'خطا در ارتباط با سرویس پیامک');
+      return;
+    }
+
     document.getElementById('otp-phone').textContent = phone;
     showPage('otp');
     startOtpTimer();
