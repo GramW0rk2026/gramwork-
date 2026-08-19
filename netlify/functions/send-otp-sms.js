@@ -15,7 +15,7 @@ exports.handler = async function (event) {
       return { statusCode: 500, body: JSON.stringify({ success: false, error: 'کلید API روی سرور تنظیم نشده' }) };
     }
 
-    const sender = '2000660110';
+    const sender = '0018018949161';
     const message = `کد تایید گرام‌ورک: ${code}`;
     const url = `https://api.kavenegar.com/v1/${apiKey}/sms/send.json?receptor=${encodeURIComponent(phone)}&sender=${encodeURIComponent(sender)}&message=${encodeURIComponent(message)}`;
 
