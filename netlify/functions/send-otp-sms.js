@@ -15,9 +15,8 @@ exports.handler = async function (event) {
       return { statusCode: 500, body: JSON.stringify({ success: false, error: 'کلید API روی سرور تنظیم نشده' }) };
     }
 
-    const sender = '0018018949161';
-    const message = `کد تایید گرام‌ورک: ${code}`;
-    const url = `https://api.kavenegar.com/v1/${apiKey}/sms/send.json?receptor=${encodeURIComponent(phone)}&sender=${encodeURIComponent(sender)}&message=${encodeURIComponent(message)}`;
+    const template = 'gramwork-otp-code';
+    const url = `https://api.kavenegar.com/v1/${apiKey}/verify/lookup.json?receptor=${encodeURIComponent(phone)}&token=${encodeURIComponent(code)}&template=${encodeURIComponent(template)}`;
 
     const res = await fetch(url);
     const data = await res.json();
