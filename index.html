@@ -289,6 +289,7 @@
     <div style="font-size:19px;font-weight:700;color:#f0e6d3;margin-bottom:8px;text-align:center">کد تأیید را وارد کنید</div>
     <div style="font-size:13px;color:#8a7060;text-align:center;margin-bottom:8px">کد ۵ رقمی به شماره زیر ارسال شد</div>
     <div style="font-size:15px;color:#e8956d;text-align:center;margin-bottom:28px;direction:ltr" id="otp-phone">09xxxxxxxxx</div>
+    <div id="temp-otp-display" style="display:none;background:#4a1e1e;border:1px solid #e86d6d;border-radius:10px;padding:10px 16px;color:#e8b56d;font-size:14px;text-align:center;margin-bottom:16px">⚠️ موقت — کد تست: <b id="temp-otp-code"></b></div>
 
     <div class="error-box" id="otp-error"></div>
     <div class="loading-box" id="otp-loading">⏳ در حال بررسی...</div>
@@ -1142,6 +1143,9 @@
     }
 
     document.getElementById('otp-phone').textContent = phone;
+    // ⚠️ موقت برای بررسی کاوه‌نگار - باید بعد از تست حذف شود
+    document.getElementById('temp-otp-code').textContent = code;
+    document.getElementById('temp-otp-display').style.display = 'block';
     showPage('otp');
     startOtpTimer();
   }
@@ -1793,4 +1797,4 @@
   });
 </script>
 </body>
-</html>
+      </html>
