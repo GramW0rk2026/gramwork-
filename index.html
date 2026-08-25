@@ -213,6 +213,7 @@
     .otp-container { display: flex; gap: 10px; justify-content: center; margin-bottom: 28px; direction: ltr; }
     .otp-input { width: 50px; height: 58px; background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 12px; color: #f0e6d3; font-size: 22px; font-weight: 700; text-align: center; outline: none; }
     .otp-input:focus { border-color: #e8956d; }
+    .enamad-badge img { width: 48px; height: 48px; cursor: pointer; }
   </style>
   </head>
 <body>
@@ -236,7 +237,7 @@
     <button class="btn btn-primary" onclick="goLogin()">ورود / ثبت‌نام</button>
     <div style="font-size:12px;color:#4a3828;margin-top:16px;text-align:center">گرام ورک — بازار کار دیجیتال ایران</div>
     <a href="/contact.html" style="font-size:12px;color:#e8956d;margin-top:10px;text-align:center;text-decoration:none">ارتباط با ما</a>
-    <div style="margin-top:16px;text-align:center">
+    <div class="enamad-badge" style="margin-top:16px;text-align:center">
       <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a>
     </div>
   </div>
@@ -283,6 +284,9 @@
       </div>
       <button class="btn btn-primary" onclick="sendOtp('register')">دریافت کد تأیید</button>
     </div>
+    <div class="enamad-badge" style="margin-top:24px;text-align:center">
+      <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a>
+    </div>
   </div>
 </div>
 
@@ -308,7 +312,10 @@
 
     <button class="btn btn-primary" style="max-width:360px" onclick="verifyOtp()">تأیید</button>
     <div style="text-align:center;font-size:13px;color:#8a7060">کد دریافت نکردید؟ <span style="color:#e8956d;cursor:pointer" onclick="goLogin()">ارسال مجدد</span></div>
-    <div style="color:#c4703f;font-size:13px;text-align:center;margin-top:8px" id="otp-timer"></div>
+    <div style="color:#c4703f;font-size:13px;text-align:center;margin-bottom:8px" id="otp-timer"></div>
+    <div class="enamad-badge" style="margin-top:16px;text-align:center">
+      <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a>
+    </div>
   </div>
 </div>
 <!-- ===== داشبورد کارفرما ===== -->
@@ -318,7 +325,10 @@
       <div style="font-size:13px;color:#8a7060">خوش اومدی 👋</div>
       <div style="font-size:17px;font-weight:700;color:#f0e6d3" id="dash-username">کاربر</div>
     </div>
-    <div class="logo" style="font-size:20px">gram<span>work</span></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="enamad-badge"><a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a></div>
+      <div class="logo" style="font-size:20px">gram<span>work</span></div>
+    </div>
   </div>
   <div class="page-content">
     <div class="wallet-card">
@@ -686,7 +696,10 @@
       <div style="font-size:13px;color:#8a7060">خوش اومدی! 👋</div>
       <div style="font-size:17px;font-weight:700;color:#f0e6d3" id="admin-dash-username">ادمین</div>
     </div>
-    <div class="logo" style="font-size:20px">gram<span>work</span></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="enamad-badge"><a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a></div>
+      <div class="logo" style="font-size:20px">gram<span>work</span></div>
+    </div>
   </div>
   <div class="page-content">
     <div class="wallet-card">
