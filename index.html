@@ -685,7 +685,20 @@
       <div class="amount-btn" onclick="selectAmount('',this)">دلخواه</div>
     </div>
     <div class="input-group"><input type="number" id="charge-amount" placeholder="مبلغ دلخواه (تومان)" /></div>
-    <button class="btn btn-primary" onclick="goToPayment()">💳 پرداخت از طریق زرین‌پال</button>
+    <div style="background:#1a1210;border:1px solid #3d2b20;border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:2;color:#f0e6d3">
+      💳 مبلغ رو به این کارت واریز کن:<br>
+      <b style="color:#e8956d;direction:ltr;display:inline-block">6219-8614-4139-3898</b><br>
+      یا شماره شبا:<br>
+      <b style="color:#e8956d;direction:ltr;display:inline-block">IR750560611828006098180102</b><br>
+      به نام: <b>محمدمهدی آبادیان</b>
+    </div>
+    <div class="input-group">
+      <label>عکس رسید واریز</label>
+      <input type="file" id="charge-receipt" accept="image/*" />
+    </div>
+    <div class="error-box" id="charge-error"></div>
+    <div class="loading-box" id="charge-loading">⏳ در حال ارسال...</div>
+    <button class="btn btn-primary" onclick="submitCharge()">✅ ثبت درخواست شارژ</button>
     <button class="btn btn-secondary" onclick="hideChargeModal()">انصراف</button>
   </div>
 </div>
@@ -1492,11 +1505,41 @@
     document.getElementById('charge-amount').value = val;
   }
 
-  function goToPayment() {
+  async function submitCharge() {
+    hideErr('charge-error');
     const amount = document.getElementById('charge-amount').value;
-    if (!amount) { alert('مبلغ رو وارد کن!'); return; }
-    alert('در حال انتقال به درگاه زرین‌پال...\nمبلغ: ' + Number(amount).toLocaleString() + ' تومان');
+    const fileInput = document.getElementById('charge-receipt');
+    const file = fileInput.files[0];
+    if (!amount) { showErr('charge-error', 'مبلغ رو وارد کن'); return; }
+    if (!file) { showErr('charge-error', 'عکس رسید رو انتخاب کن'); return; }
+
+    showLoad('charge-loading', true);
+
+    const fileExt = file.name.split('.').pop();
+    const filePath = `receipts/${currentUser.id}_${Date.now()}.${fileExt}`;
+    const { error: uploadError } = await sb.storage.from('uploads').upload(filePath, file);
+    if (uploadError) {
+      showLoad('charge-loading', false);
+      showErr('charge-error', 'خطا در آپلود رسید — دوباره تلاش کن');
+      return;
+    }
+    const { data: urlData } = sb.storage.from('uploads').getPublicUrl(filePath);
+
+    const { error: txError } = await sb.from('transactions').insert({
+      user_id: currentUser.id,
+      type: 'charge',
+      amount: parseInt(amount),
+      status: 'pending',
+      receipt_link: urlData.publicUrl
+    });
+
+    showLoad('charge-loading', false);
+    if (txError) { showErr('charge-error', 'خطا در ثبت درخواست — دوباره تلاش کن'); return; }
+
+    alert('✅ درخواست شارژ ثبت شد!\nبعد از تایید سوپرادمین، موجودی کیف‌پولت اضافه می‌شه.');
     hideChargeModal();
+    document.getElementById('charge-amount').value = '';
+    fileInput.value = '';
   }
 
   // ===== تحویل کار کارفرما =====
