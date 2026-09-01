@@ -977,8 +977,27 @@
           <div class="tx-amount ${t.type === 'charge' ? 'amount-plus' : t.type === 'locked' ? 'amount-locked' : 'amount-minus'}">${t.type === 'charge' ? '+' : '-'}${Number(t.amount || 0).toLocaleString()}</div>
         </div>
         <div class="tx-date">${new Date(t.created_at).toLocaleDateString('fa-IR')}</div>
+        ${t.type === 'charge' && t.status === 'pending' && t.receipt_link ? `<div style="margin-top:8px"><img src="${t.receipt_link}" style="width:100%;max-width:220px;border-radius:10px;border:1px solid #2d1f10;cursor:pointer" onclick="window.open('${t.receipt_link}','_blank')" /></div>` : ''}
+        ${t.type === 'charge' && t.status === 'pending' ? `<div style="display:flex;gap:8px;margin-top:8px"><button class="action-btn" style="background:#2d4a1e;color:#7bc67e" onclick="approveCharge('${t.id}','${t.user_id}',${t.amount})">✅ تایید و شارژ کیف‌پول</button><button class="action-btn" style="background:#4a1e1e;color:#e86d6d" onclick="rejectCharge('${t.id}')">❌ رد درخواست</button></div>` : ''}
         ${t.type === 'locked' ? `<div style="display:flex;gap:8px;margin-top:8px"><button class="action-btn" style="background:#1e3a4a;color:#6db8e8" onclick="releaseTx('${t.id}')">💰 آزادسازی</button><button class="action-btn" style="background:#4a1e1e;color:#e86d6d" onclick="refundTx('${t.id}')">↩️ برگشت وجه</button></div>` : ''}
       </div>`).join('');
+  }
+
+  async function approveCharge(txId, userId, amount) {
+    if (!confirm('شارژ تایید و به کیف‌پول کاربر اضافه بشه؟')) return;
+    const { data: wallet } = await sb.from('wallets').select('balance').eq('user_id', userId).maybeSingle();
+    const newBalance = (wallet?.balance || 0) + Number(amount);
+    await sb.from('wallets').update({ balance: newBalance }).eq('user_id', userId);
+    await sb.from('transactions').update({ status: 'done' }).eq('id', txId);
+    alert('✅ کیف‌پول شارژ شد!');
+    loadTransactions();
+  }
+
+  async function rejectCharge(txId) {
+    if (!confirm('این درخواست شارژ رد بشه؟')) return;
+    await sb.from('transactions').update({ status: 'rejected' }).eq('id', txId);
+    alert('درخواست رد شد.');
+    loadTransactions();
   }
 
   function filterTx(type, btn) {
@@ -1170,4 +1189,4 @@
   });
 </script>
 </body>
-</html>
+      </html>
