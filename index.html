@@ -224,12 +224,12 @@
     <div class="logo" style="font-size:38px;margin-bottom:8px">gram<span>work</span></div>
     <div style="font-size:14px;color:#8a7060;margin-bottom:36px;text-align:center">ادمین مناسب، کارفرمای مناسب</div>
 
-    <div class="card" style="max-width:360px;width:100%;cursor:pointer" onclick="goLogin()">
+    <div class="card" style="max-width:360px;width:100%;cursor:pointer" onclick="showPublicExplore('employer')">
       <div style="font-size:17px;color:#e8956d;font-weight:700;margin-bottom:6px">👨‍💼 کارفرما هستم</div>
       <div style="font-size:13px;color:#8a7060;line-height:1.5">نیرو متخصص برای پیج و کانالم پیدا می‌کنم</div>
     </div>
 
-    <div class="card" style="max-width:360px;width:100%;cursor:pointer" onclick="goLogin()">
+    <div class="card" style="max-width:360px;width:100%;cursor:pointer" onclick="showPublicExplore('admin')">
       <div style="font-size:17px;color:#e8956d;font-weight:700;margin-bottom:6px">👨‍💻 ادمین هستم</div>
       <div style="font-size:13px;color:#8a7060;line-height:1.5">پروژه می‌گیرم و درآمد کسب می‌کنم</div>
     </div>
@@ -240,6 +240,24 @@
     <div class="enamad-badge" style="margin-top:16px;text-align:center">
       <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a>
     </div>
+  </div>
+</div>
+
+<!-- ===== کاوش عمومی (بدون لاگین) ===== -->
+<div class="page" id="page-explore">
+  <div class="header">
+    <div class="back-btn" onclick="showPage('landing')">&#8592;</div>
+    <div class="header-title" id="explore-title">کاوش</div>
+    <div style="font-size:13px;color:#e8956d;cursor:pointer" onclick="goLogin()">ورود / ثبت‌نام</div>
+  </div>
+  <div class="page-content">
+    <div style="padding:16px 16px 0">
+      <div style="font-size:13px;color:#8a7060;line-height:1.7;margin-bottom:14px" id="explore-subtitle"></div>
+    </div>
+    <div class="section" id="explore-list"><div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">در حال بارگذاری...</div></div>
+  </div>
+  <div class="bottom-bar">
+    <button class="btn btn-primary" style="margin:0" id="explore-cta" onclick="exploreCtaAction()">ثبت‌نام کن</button>
   </div>
 </div>
 
@@ -687,9 +705,9 @@
     <div class="input-group"><input type="number" id="charge-amount" placeholder="مبلغ دلخواه (تومان)" /></div>
     <div style="background:#1a1210;border:1px solid #3d2b20;border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:2;color:#f0e6d3">
       💳 مبلغ رو به این کارت واریز کن:<br>
-      <b style="color:#e8956d;direction:ltr;display:inline-block">6219-8614-4139-3898</b><br>
+      <b style="color:#e8956d;direction:ltr;display:inline-block">6219-8614-9574-2016</b><br>
       یا شماره شبا:<br>
-      <b style="color:#e8956d;direction:ltr;display:inline-block">IR750560611828006098180102</b><br>
+      <b style="color:#e8956d;direction:ltr;display:inline-block">IR400560611828016098180101</b><br>
       به نام: <b>محمدمهدی آبادیان</b>
     </div>
     <div class="input-group">
@@ -1089,6 +1107,66 @@
 
   function goLogin() { showPage('login'); }
 
+  // ===== کاوش عمومی (بدون لاگین) =====
+  let exploreMode = 'employer';
+
+  function goLoginWithRole(role) {
+    showPage('login');
+    switchTab('register');
+    selectRole(role);
+  }
+
+  async function showPublicExplore(mode) {
+    exploreMode = mode;
+    showPage('explore');
+    const title = document.getElementById('explore-title');
+    const subtitle = document.getElementById('explore-subtitle');
+    const cta = document.getElementById('explore-cta');
+    if (mode === 'employer') {
+      if (title) title.textContent = 'ادمین‌های فعال';
+      if (subtitle) subtitle.textContent = 'این‌ها بخشی از ادمین‌های فعال گرام‌ورک هستن. برای ثبت پروژه و همکاری با یکی از اون‌ها، ثبت‌نام کن.';
+      if (cta) cta.textContent = '+ ثبت پروژه جدید (نیاز به ثبت‌نام)';
+    } else {
+      if (title) title.textContent = 'پروژه‌های باز';
+      if (subtitle) subtitle.textContent = 'این‌ها پروژه‌های واقعی و بازی هستن که کارفرماها ثبت کردن. برای ارسال درخواست، ثبت‌نام کن.';
+      if (cta) cta.textContent = '+ می‌خوام پروژه بگیرم (نیاز به ثبت‌نام)';
+    }
+    loadPublicExplore();
+  }
+
+  async function loadPublicExplore() {
+    const list = document.getElementById('explore-list');
+    if (!list) return;
+    list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">در حال بارگذاری...</div>';
+
+    if (exploreMode === 'employer') {
+      const { data } = await sb.from('users').select('*').eq('role', 'admin').eq('banned', false).order('rating', { ascending: false }).limit(20);
+      if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز ادمینی ثبت‌نام نکرده</div>'; return; }
+      list.innerHTML = data.map(a => `
+        <div class="available-card">
+          <div class="project-top"><div class="project-title">${a.full_name || 'ادمین'}</div>${a.verified ? '<div class="badge badge-active">✅ تایید شده</div>' : ''}</div>
+          <div style="font-size:12px;color:#8a7060">⭐ امتیاز: ${a.rating || 0}</div>
+        </div>`).join('');
+    } else {
+      const { data } = await sb.from('projects').select('*').eq('status', 'pending').is('admin_id', null).order('created_at', { ascending: false }).limit(20);
+      if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">فعلاً پروژه‌ی بازی نیست</div>'; return; }
+      list.innerHTML = data.map(p => `
+        <div class="available-card">
+          <div class="project-top"><div class="project-title">${p.title}</div><div class="badge badge-new">باز</div></div>
+          <div style="font-size:13px;color:#8a7060;margin-bottom:8px;line-height:1.5">${(p.description || '').substring(0, 80)}${p.description && p.description.length > 80 ? '...' : ''}</div>
+          <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+            <span class="info-tag">${p.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای'}</span>
+            ${p.platform ? `<span class="info-tag">${p.platform}</span>` : ''}
+          </div>
+          <div class="project-price">${Number(p.budget).toLocaleString()} تومان</div>
+        </div>`).join('');
+    }
+  }
+
+  function exploreCtaAction() {
+    goLoginWithRole(exploreMode);
+  }
+
   // ===== لاگین =====
   function switchTab(tab) {
     document.getElementById('tab-login').classList.toggle('active', tab === 'login');
@@ -1349,14 +1427,59 @@
     if (db) { db.className = 'badge ' + badgeCls(p.status); db.textContent = badgeLabel(p.status); }
 
     // لود درخواست‌ها
-    const { data: reqs } = await sb.from('projects').select('proposals(*)').eq('id', id).maybeSingle();
+    const { data: reqs } = await sb.from('proposals').select('*, admin:admin_id(full_name, rating)').eq('project_id', id).order('created_at', { ascending: false });
     const reqList = document.getElementById('requests-list');
     const reqCount = document.getElementById('detail-requests');
-    if (reqCount) reqCount.textContent = '۰';
-    if (reqList) reqList.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز درخواستی نیست</div>';
+    if (reqCount) reqCount.textContent = toFaDigits(reqs ? reqs.length : 0);
+    if (reqList) {
+      if (!reqs || !reqs.length) {
+        reqList.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز درخواستی نیست</div>';
+      } else {
+        reqList.innerHTML = reqs.map(r => `
+          <div class="request-card">
+            <div class="req-top">
+              <div style="font-weight:700;color:#f0e6d3">${r.admin?.full_name || 'ادمین'}</div>
+              <div class="req-price">${Number(r.price).toLocaleString()} تومان</div>
+            </div>
+            <div class="req-msg">${r.message || ''}${r.deadline ? ' — زمان تحویل: ' + r.deadline : ''}</div>
+            ${r.status === 'pending' ? `
+            <div class="req-actions">
+              <button class="btn-accept" onclick="acceptProposal('${r.id}','${r.admin_id}','${id}',${r.price},'${(r.deadline||'').replace(/'/g,"")}')">✅ قبول</button>
+              <button class="btn-reject-sm" onclick="rejectProposal('${r.id}')">رد</button>
+            </div>` : `<div style="font-size:12px;color:${r.status === 'accepted' ? '#7bc67e' : '#e86d6d'}">${r.status === 'accepted' ? '✅ پذیرفته شده' : '❌ رد شده'}</div>`}
+          </div>`).join('');
+      }
+    }
 
     pageHistory.push(currentPage);
     showPage('project-details');
+  }
+
+  function toFaDigits(n) { return String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]); }
+
+  async function acceptProposal(proposalId, adminId, projectId, price, deadline) {
+    if (!confirm('این درخواست رو قبول می‌کنی؟ بعد از قبول، باید قرارداد رو امضا کنی.')) return;
+    await sb.from('proposals').update({ status: 'accepted' }).eq('id', proposalId);
+    await sb.from('proposals').update({ status: 'rejected' }).eq('project_id', projectId).neq('id', proposalId);
+    await sb.from('projects').update({ admin_id: adminId }).eq('id', projectId);
+    await sb.from('contracts').insert({
+      project_id: projectId,
+      employer_id: currentUser.id,
+      admin_id: adminId,
+      amount: price,
+      duration: deadline,
+      employer_signed: false,
+      admin_signed: false,
+      status: 'pending'
+    });
+    alert('✅ درخواست قبول شد! حالا باید قرارداد رو امضا کنی.');
+    openContractForProject(projectId);
+  }
+
+  async function rejectProposal(proposalId) {
+    if (!confirm('این درخواست رد بشه؟')) return;
+    await sb.from('proposals').update({ status: 'rejected' }).eq('id', proposalId);
+    openProjectDetail(currentProjectId);
   }
 
   async function deleteProject() {
@@ -1396,6 +1519,7 @@
   }
 
   async function submitProject() {
+    if (!currentUser) { alert('اول باید ثبت‌نام یا وارد بشی'); goLogin(); return; }
     hideErr('np-error');
     const title = document.getElementById('np-title').value.trim();
     const desc = document.getElementById('np-desc').value.trim();
@@ -1418,6 +1542,25 @@
   }
 
   // ===== قرارداد کارفرما =====
+  let currentContractId = null;
+  let currentContractProjectId = null;
+
+  async function openContractForProject(projectId) {
+    const { data: c } = await sb.from('contracts').select('*, project:project_id(title,type), admin:admin_id(full_name)').eq('project_id', projectId).order('created_at', { ascending: false }).limit(1).maybeSingle();
+    if (!c) return;
+    currentContractId = c.id;
+    currentContractProjectId = projectId;
+    document.getElementById('contract-employer').textContent = currentUser.full_name || 'کارفرما';
+    document.getElementById('contract-admin').textContent = c.admin?.full_name || '-';
+    document.getElementById('contract-title').textContent = c.project?.title || '-';
+    document.getElementById('contract-type').textContent = c.project?.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای';
+    document.getElementById('contract-amount').textContent = Number(c.amount).toLocaleString() + ' تومان';
+    document.getElementById('agree1').checked = false;
+    document.getElementById('agree2').checked = false;
+    checkSign();
+    showPage('contract');
+  }
+
   function checkSign() {
     const a1 = document.getElementById('agree1').checked;
     const a2 = document.getElementById('agree2').checked;
@@ -1425,13 +1568,47 @@
     if (btn) btn.disabled = !(a1 && a2);
   }
 
-  function signContract() {
-    if (!confirm('قرارداد رو امضا می‌کنی؟')) return;
-    showPage('chat');
+  async function signContract() {
+    if (!currentContractId) return;
+    if (!confirm('قرارداد رو امضا می‌کنی؟ مبلغ از کیف‌پولت کسر و قفل می‌شه.')) return;
+
+    const { data: c } = await sb.from('contracts').select('*').eq('id', currentContractId).single();
+    const { data: wallet } = await sb.from('wallets').select('*').eq('user_id', currentUser.id).single();
+    if (!wallet || (wallet.balance || 0) < c.amount) {
+      alert('موجودی کیف‌پولت کافی نیست! اول شارژ کن.');
+      return;
+    }
+
+    await sb.from('wallets').update({
+      balance: wallet.balance - c.amount,
+      locked_balance: (wallet.locked_balance || 0) + c.amount
+    }).eq('user_id', currentUser.id);
+
+    await sb.from('transactions').insert({
+      user_id: currentUser.id,
+      project_id: currentContractProjectId,
+      type: 'locked',
+      amount: c.amount,
+      status: 'done'
+    });
+
+    await sb.from('contracts').update({ employer_signed: true }).eq('id', currentContractId);
+
+    const bothSigned = c.admin_signed === true;
+    if (bothSigned) {
+      await sb.from('contracts').update({ status: 'active' }).eq('id', currentContractId);
+      await sb.from('projects').update({ status: 'active' }).eq('id', currentContractProjectId);
+    }
+
+    alert('✅ قرارداد امضا شد و مبلغ قفل شد!');
+    showPage('projects');
   }
 
-  function rejectContract() {
+  async function rejectContract() {
+    if (!currentContractId) return;
     if (!confirm('قرارداد رو رد می‌کنی؟')) return;
+    await sb.from('contracts').update({ status: 'rejected' }).eq('id', currentContractId);
+    await sb.from('projects').update({ admin_id: null }).eq('id', currentContractProjectId);
     goBack();
   }
 
@@ -1506,6 +1683,7 @@
   }
 
   async function submitCharge() {
+    if (!currentUser) { alert('اول باید ثبت‌نام یا وارد بشی'); goLogin(); return; }
     hideErr('charge-error');
     const amount = document.getElementById('charge-amount').value;
     const fileInput = document.getElementById('charge-receipt');
@@ -1577,7 +1755,7 @@
               <div class="project-meta">${p.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای'}</div>
               <div class="project-price">${Number(p.budget * 0.9).toLocaleString()} تومان</div>
               <div style="display:flex;gap:8px;margin-top:10px;border-top:1px solid #3d2b20;padding-top:10px">
-                <button style="flex:1;padding:8px;background:#e8956d;color:#1a1210;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="showPage('admin-contract')">قرارداد</button>
+                <button style="flex:1;padding:8px;background:#e8956d;color:#1a1210;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="openAdminContractForProject('${p.id}')">قرارداد</button>
                 <button style="flex:1;padding:8px;background:transparent;border:1px solid #e8956d;color:#e8956d;border-radius:10px;font-size:12px;cursor:pointer;font-family:inherit" onclick="showPage('admin-delivery')">تحویل</button>
                 <button style="padding:8px 12px;background:transparent;border:1px solid #3d2b20;color:#8a7060;border-radius:10px;font-size:12px;cursor:pointer;font-family:inherit" onclick="showPage('admin-chat')">💬</button>
               </div>
@@ -1679,14 +1857,28 @@
   }
 
   async function applyProject() {
+    if (!currentUser) { alert('اول باید ثبت‌نام یا وارد بشی'); goLogin(); return; }
     if (!currentBrowseProject) return;
     hideErr('apply-error');
     const price = document.getElementById('apply-price').value.trim();
     const msg = document.getElementById('apply-msg').value.trim();
+    const deadline = document.getElementById('apply-deadline').value.trim();
     if (!price || !msg) { showErr('apply-error', 'قیمت و توضیحات رو پر کن'); return; }
     showLoad('apply-loading', true);
-    alert('✅ درخواست ارسال شد!\nکارفرما در حال بررسی است.');
+
+    const { error } = await sb.from('proposals').insert({
+      project_id: currentBrowseProject.id,
+      admin_id: currentUser.id,
+      price: parseInt(price),
+      message: msg,
+      deadline: deadline,
+      status: 'pending'
+    });
+
     showLoad('apply-loading', false);
+    if (error) { showErr('apply-error', 'خطا در ارسال درخواست — دوباره تلاش کن'); return; }
+
+    alert('✅ درخواست ارسال شد!\nکارفرما در حال بررسی است.');
     showPage('admin-my-projects');
   }
 
@@ -1711,7 +1903,7 @@
         <div class="project-meta">${p.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای'}</div>
         <div class="project-price">${Number(p.budget * 0.9).toLocaleString()} تومان (دریافتی شما)</div>
         <div style="display:flex;gap:8px;margin-top:10px;border-top:1px solid #3d2b20;padding-top:10px">
-          <button style="flex:1;padding:8px;background:#e8956d;color:#1a1210;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="showPage('admin-contract')">قرارداد</button>
+          <button style="flex:1;padding:8px;background:#e8956d;color:#1a1210;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="openAdminContractForProject('${p.id}')">قرارداد</button>
           <button style="flex:1;padding:8px;background:transparent;border:1px solid #e8956d;color:#e8956d;border-radius:10px;font-size:12px;cursor:pointer;font-family:inherit" onclick="showPage('admin-delivery')">تحویل</button>
           <button style="padding:8px 12px;background:transparent;border:1px solid #3d2b20;color:#8a7060;border-radius:10px;font-size:12px;cursor:pointer;font-family:inherit" onclick="showPage('admin-chat')">💬</button>
         </div>
@@ -1726,6 +1918,23 @@
   }
 
   // ===== قرارداد ادمین =====
+  async function openAdminContractForProject(projectId) {
+    const { data: c } = await sb.from('contracts').select('*, project:project_id(title,type), employer:employer_id(full_name)').eq('project_id', projectId).order('created_at', { ascending: false }).limit(1).maybeSingle();
+    if (!c) return;
+    currentContractId = c.id;
+    currentContractProjectId = projectId;
+    document.getElementById('admin-contract-employer').textContent = c.employer?.full_name || '-';
+    document.getElementById('admin-contract-admin').textContent = currentUser.full_name || 'ادمین';
+    document.getElementById('admin-contract-title').textContent = c.project?.title || '-';
+    document.getElementById('admin-contract-type').textContent = c.project?.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای';
+    document.getElementById('admin-contract-amount').textContent = Number(c.amount).toLocaleString() + ' تومان';
+    document.getElementById('admin-contract-net').textContent = Number(Math.floor(c.amount * 0.9)).toLocaleString() + ' تومان';
+    document.getElementById('admin-agree1').checked = false;
+    document.getElementById('admin-agree2').checked = false;
+    checkAdminSign();
+    showPage('admin-contract');
+  }
+
   function checkAdminSign() {
     const a1 = document.getElementById('admin-agree1').checked;
     const a2 = document.getElementById('admin-agree2').checked;
@@ -1733,13 +1942,28 @@
     if (btn) btn.disabled = !(a1 && a2);
   }
 
-  function signAdminContract() {
+  async function signAdminContract() {
+    if (!currentContractId) return;
     if (!confirm('قرارداد رو امضا می‌کنی؟')) return;
-    showPage('admin-chat');
+
+    const { data: c } = await sb.from('contracts').select('*').eq('id', currentContractId).single();
+    await sb.from('contracts').update({ admin_signed: true }).eq('id', currentContractId);
+
+    const bothSigned = c.employer_signed === true;
+    if (bothSigned) {
+      await sb.from('contracts').update({ status: 'active' }).eq('id', currentContractId);
+      await sb.from('projects').update({ status: 'active' }).eq('id', currentContractProjectId);
+    }
+
+    alert(bothSigned ? '✅ قرارداد کامل شد و پروژه فعال شد!' : '✅ قرارداد امضا شد! در انتظار امضای کارفرما.');
+    showPage('admin-my-projects');
   }
 
-  function rejectAdminContract() {
+  async function rejectAdminContract() {
+    if (!currentContractId) return;
     if (!confirm('قرارداد رو رد می‌کنی؟')) return;
+    await sb.from('contracts').update({ status: 'rejected' }).eq('id', currentContractId);
+    await sb.from('projects').update({ admin_id: null }).eq('id', currentContractProjectId);
     goBack();
   }
 
