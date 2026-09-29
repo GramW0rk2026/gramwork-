@@ -279,7 +279,14 @@
         <label>شماره موبایل</label>
         <input type="tel" id="login-phone" placeholder="09xxxxxxxxx" maxlength="11" />
       </div>
-      <button class="btn btn-primary" onclick="sendOtp('login')">دریافت کد تأیید</button>
+      <div class="input-group">
+        <label>رمز عبور</label>
+        <input type="password" id="login-password" placeholder="رمز عبورت" onkeydown="if(event.key==='Enter')loginWithPassword()" />
+      </div>
+      <button class="btn btn-primary" onclick="loginWithPassword()">ورود</button>
+      <div style="text-align:center;font-size:13px;color:#8a7060;margin-top:-6px">
+        رمز نداری یا فراموش کردی؟ <span style="color:#e8956d;cursor:pointer" onclick="sendOtp('access')">با کد تأیید وارد شو</span>
+      </div>
     </div>
 
     <div id="register-form" style="display:none;width:100%;max-width:360px">
@@ -290,6 +297,14 @@
       <div class="input-group">
         <label>نام و نام خانوادگی</label>
         <input type="text" id="register-name" placeholder="محمد رضایی" />
+      </div>
+      <div class="input-group">
+        <label>رمز عبور</label>
+        <input type="password" id="register-password" placeholder="حداقل ۶ کاراکتر" />
+      </div>
+      <div class="input-group">
+        <label>تکرار رمز عبور</label>
+        <input type="password" id="register-password2" placeholder="رمز رو دوباره وارد کن" />
       </div>
       <label style="font-size:13px;color:#a08060;margin-bottom:10px;display:block">نقش من:</label>
       <div class="role-select">
@@ -328,9 +343,22 @@
       <input class="otp-input" type="number" id="o5" />
     </div>
 
-    <button class="btn btn-primary" style="max-width:360px" onclick="verifyOtp()">تأیید</button>
+    <button class="btn btn-primary" id="otp-verify-btn" style="max-width:360px" onclick="verifyOtp()">تأیید</button>
     <div style="text-align:center;font-size:13px;color:#8a7060">کد دریافت نکردید؟ <span style="color:#e8956d;cursor:pointer" onclick="goLogin()">ارسال مجدد</span></div>
     <div style="color:#c4703f;font-size:13px;text-align:center;margin-bottom:8px" id="otp-timer"></div>
+
+    <div id="otp-newpass-box" style="display:none;width:100%;max-width:360px">
+      <div style="font-size:13px;color:#7bc67e;text-align:center;margin-bottom:14px">✅ شماره تأیید شد — یه رمز عبور برای ورودهای بعدی انتخاب کن</div>
+      <div class="input-group">
+        <label>رمز عبور جدید</label>
+        <input type="password" id="otp-newpass" placeholder="حداقل ۶ کاراکتر" />
+      </div>
+      <div class="input-group">
+        <label>تکرار رمز عبور جدید</label>
+        <input type="password" id="otp-newpass2" placeholder="رمز رو دوباره وارد کن" />
+      </div>
+      <button class="btn btn-primary" onclick="submitNewPasswordAfterOtp()">ثبت رمز و ورود</button>
+    </div>
     <div class="enamad-badge" style="margin-top:16px;text-align:center">
       <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a>
     </div>
@@ -1196,7 +1224,7 @@
       if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز ادمینی ثبت‌نام نکرده</div>'; return; }
       list.innerHTML = data.map(a => `
         <div class="available-card">
-          <div class="project-top"><div class="project-title">${a.full_name || 'ادمین'}</div>${a.verified ? '<div class="badge badge-active">✅ تایید شده</div>' : ''}</div>
+          <div class="project-top"><div class="project-title">${escapeHtml(a.full_name || 'ادمین')}</div>${a.verified ? '<div class="badge badge-active">✅ تایید شده</div>' : ''}</div>
           <div style="font-size:12px;color:#8a7060">⭐ امتیاز: ${a.rating || 0}</div>
         </div>`).join('');
     } else {
@@ -1204,11 +1232,11 @@
       if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">فعلاً پروژه‌ی بازی نیست</div>'; return; }
       list.innerHTML = data.map(p => `
         <div class="available-card">
-          <div class="project-top"><div class="project-title">${p.title}</div><div class="badge badge-new">باز</div></div>
-          <div style="font-size:13px;color:#8a7060;margin-bottom:8px;line-height:1.5">${(p.description || '').substring(0, 80)}${p.description && p.description.length > 80 ? '...' : ''}</div>
+          <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge badge-new">باز</div></div>
+          <div style="font-size:13px;color:#8a7060;margin-bottom:8px;line-height:1.5">${escapeHtml((p.description || '').substring(0, 80))}${p.description && p.description.length > 80 ? '...' : ''}</div>
           <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
             <span class="info-tag">${p.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای'}</span>
-            ${p.platform ? `<span class="info-tag">${p.platform}</span>` : ''}
+            ${p.platform ? `<span class="info-tag">${escapeHtml(p.platform)}</span>` : ''}
           </div>
           <div class="project-price">${Number(p.budget).toLocaleString()} تومان</div>
         </div>`).join('');
@@ -1249,11 +1277,58 @@
     if (el) el.style.display = show ? 'block' : 'none';
   }
 
+  // شماره موبایل رو به یه ایمیل ساختگی تبدیل می‌کنه تا بشه از خود Supabase Auth
+  // (همون سیستمی که سوپرادمین باهاش وارد می‌شه) برای کاربرای عادی هم استفاده کرد.
+  function phoneToEmail(phone) { return phone + '@gramwork.local'; }
+
+  // فقط برای انتقال بین «فرم ثبت‌نام» و «تأیید OTP» در همون تب مرورگر — رمز
+  // هیچ‌وقت تو localStorage یا دیتابیس خام ذخیره نمی‌شه.
+  let pendingAuth = null; // { type, phone, name, role, password }
+
+  // بعضی پروژه‌های Supabase تنظیمشون اینه که ایمیل باید تأیید بشه تا نشست فعال بشه —
+  // چون ایمیل ما ساختگیه و هیچ‌وقت واقعاً تأیید نمی‌شه، این تابع همون حسابی که
+  // تازه ساختیم رو فوراً (و فقط همون رو) به‌صورت امن از سمت سرور تأییدشده می‌کنه.
+  async function ensureSessionAfterSignup(signUpData, email, password) {
+    if (signUpData && signUpData.session) return signUpData;
+    if (!signUpData || !signUpData.user) return null;
+    await sb.rpc('force_confirm_gramwork_signup', { p_user_id: signUpData.user.id });
+    const { data: signInData, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error || !signInData.session) return null;
+    return signInData;
+  }
+
+  async function loginWithPassword() {
+    hideErr('login-error');
+    const phone = document.getElementById('login-phone').value.trim();
+    const password = document.getElementById('login-password').value;
+    if (!phone || phone.length !== 11 || !phone.startsWith('09')) { showErr('login-error', 'شماره موبایل معتبر وارد کن (مثلاً 09123456789)'); return; }
+    if (!password) { showErr('login-error', 'رمز عبورت رو وارد کن'); return; }
+    showLoad('login-loading', true);
+    const { data, error } = await sb.auth.signInWithPassword({ email: phoneToEmail(phone), password });
+    if (error || !data.session) {
+      showLoad('login-loading', false);
+      showErr('login-error', 'شماره یا رمز اشتباهه — یا هنوز رمزی نساختی، از گزینه‌ی «با کد تأیید وارد شو» استفاده کن');
+      return;
+    }
+    const { data: profile } = await sb.from('users').select('*').eq('auth_uid', data.user.id).maybeSingle();
+    showLoad('login-loading', false);
+    if (!profile) { showErr('login-error', 'حساب کاربری پیدا نشد'); await sb.auth.signOut(); return; }
+    if (profile.banned) { showErr('login-error', 'حساب شما مسدود شده'); await sb.auth.signOut(); return; }
+    enterAsUser(profile);
+  }
+
+  function enterAsUser(profile) {
+    currentUser = profile;
+    currentRole = profile.role;
+    if (currentRole === 'admin') showPage('admin-dashboard');
+    else showPage('dashboard');
+  }
+
   async function sendOtp(type) {
     hideErr('login-error');
-    const phone = type === 'login'
-      ? document.getElementById('login-phone').value.trim()
-      : document.getElementById('register-phone').value.trim();
+    const phone = type === 'register'
+      ? document.getElementById('register-phone').value.trim()
+      : document.getElementById('login-phone').value.trim();
 
     if (!phone || phone.length !== 11 || !phone.startsWith('09')) {
       showErr('login-error', 'شماره موبایل معتبر وارد کن (مثلاً 09123456789)');
@@ -1264,31 +1339,28 @@
 
     if (type === 'register') {
       const name = document.getElementById('register-name').value.trim();
+      const pass = document.getElementById('register-password').value;
+      const pass2 = document.getElementById('register-password2').value;
       if (!name) { showLoad('login-loading', false); showErr('login-error', 'نام و نام خانوادگی رو وارد کن'); return; }
+      if (!pass || pass.length < 6) { showLoad('login-loading', false); showErr('login-error', 'رمز عبور باید حداقل ۶ کاراکتر باشه'); return; }
+      if (pass !== pass2) { showLoad('login-loading', false); showErr('login-error', 'تکرار رمز عبور یکی نیست'); return; }
       const { data: ex } = await sb.from('users').select('id').eq('phone', phone).maybeSingle();
       if (ex) { showLoad('login-loading', false); showErr('login-error', 'این شماره قبلاً ثبت‌نام کرده — از تب ورود وارد شو'); return; }
-      localStorage.setItem('reg_name', name);
-      localStorage.setItem('reg_role', selectedRole);
-      localStorage.setItem('auth_type', 'register');
+      pendingAuth = { type: 'register', phone, name, role: selectedRole, password: pass };
     } else {
-      const { data: user } = await sb.from('users').select('id,role,banned').eq('phone', phone).maybeSingle();
+      const { data: user } = await sb.from('users').select('id,banned').eq('phone', phone).maybeSingle();
       if (!user) { showLoad('login-loading', false); showErr('login-error', 'این شماره ثبت‌نام نشده — از تب ثبت‌نام اقدام کن'); return; }
       if (user.banned) { showLoad('login-loading', false); showErr('login-error', 'حساب شما مسدود شده'); return; }
-      localStorage.setItem('auth_type', 'login');
+      pendingAuth = { type: 'access', phone };
     }
 
-    localStorage.setItem('pending_phone', phone);
-    const code = Math.floor(10000 + Math.random() * 90000).toString();
-    const expires = new Date(Date.now() + 5 * 60 * 1000).toISOString();
-    await sb.from('otps').delete().eq('phone', phone);
-    const { error } = await sb.from('otps').insert({ phone, code, expires_at: expires });
-    if (error) { showLoad('login-loading', false); showErr('login-error', 'خطا در ارسال کد — دوباره تلاش کن'); return; }
-
+    // کد تأیید دیگه اینجا ساخته نمی‌شه — کاملاً سمت سرور (تابع نتلیفای) ساخته و
+    // ذخیره می‌شه، مرورگر فقط شماره رو می‌فرسته و منتظر نتیجه می‌مونه.
     try {
       const smsRes = await fetch('/.netlify/functions/send-otp-sms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, code })
+        body: JSON.stringify({ phone })
       });
       const smsData = await smsRes.json();
       showLoad('login-loading', false);
@@ -1303,6 +1375,8 @@
     }
 
     document.getElementById('otp-phone').textContent = phone;
+    document.getElementById('otp-newpass-box').style.display = 'none';
+    document.getElementById('otp-verify-btn').style.display = 'block';
     showPage('otp');
     startOtpTimer();
   }
@@ -1336,37 +1410,72 @@
     hideErr('otp-error');
     const code = Array.from(otpInputs).map(i => i.value).join('');
     if (code.length !== 5) { showErr('otp-error', 'کد ۵ رقمی رو کامل وارد کن'); return; }
+    if (!pendingAuth) { showErr('otp-error', 'یه چیزی اشتباه شد — دوباره از اول امتحان کن'); return; }
     showLoad('otp-loading', true);
-    const phone = localStorage.getItem('pending_phone');
-    const { data: otp } = await sb.from('otps').select('*').eq('phone', phone).eq('code', code).eq('used', false).maybeSingle();
-    if (!otp) { showLoad('otp-loading', false); showErr('otp-error', 'کد اشتباه یا منقضی شده'); return; }
-    if (new Date(otp.expires_at) < new Date()) { showLoad('otp-loading', false); showErr('otp-error', 'کد منقضی شده — دوباره درخواست بده'); return; }
-    await sb.from('otps').update({ used: true }).eq('id', otp.id);
 
-    const authType = localStorage.getItem('auth_type');
-    if (authType === 'register') {
-      const { data: newUser, error } = await sb.from('users').insert({
-        phone, full_name: localStorage.getItem('reg_name'), role: localStorage.getItem('reg_role')
+    const { data: ok, error: rpcErr } = await sb.rpc('verify_otp_code', { p_phone: pendingAuth.phone, p_code: code });
+    if (rpcErr || !ok) { showLoad('otp-loading', false); showErr('otp-error', 'کد اشتباه یا منقضی شده'); return; }
+
+    if (pendingAuth.type === 'register') {
+      const { data: rawSignUp, error: signUpErr } = await sb.auth.signUp({
+        email: phoneToEmail(pendingAuth.phone), password: pendingAuth.password
+      });
+      if (signUpErr) { showLoad('otp-loading', false); showErr('otp-error', 'خطا در ساخت حساب — دوباره تلاش کن'); return; }
+      const authData = await ensureSessionAfterSignup(rawSignUp, phoneToEmail(pendingAuth.phone), pendingAuth.password);
+      if (!authData) { showLoad('otp-loading', false); showErr('otp-error', 'خطا در ساخت حساب — دوباره تلاش کن'); return; }
+      const { data: newUser, error: insErr } = await sb.from('users').insert({
+        phone: pendingAuth.phone, full_name: pendingAuth.name, role: pendingAuth.role, auth_uid: authData.user.id
       }).select().single();
-      if (error) { showLoad('otp-loading', false); showErr('otp-error', 'خطا در ساخت حساب — دوباره تلاش کن'); return; }
+      if (insErr) { showLoad('otp-loading', false); showErr('otp-error', 'خطا در ساخت پروفایل — دوباره تلاش کن'); return; }
       await sb.from('wallets').insert({ user_id: newUser.id });
-      currentUser = newUser;
-    } else {
-      const { data: user } = await sb.from('users').select('*').eq('phone', phone).single();
-      currentUser = user;
+      showLoad('otp-loading', false);
+      pendingAuth = null;
+      enterAsUser(newUser);
+      return;
     }
 
+    // type === 'access': شماره تأیید شد؛ حالا رمز عبور (اولین بار یا جدید) رو بگیر
     showLoad('otp-loading', false);
-    currentRole = currentUser.role;
-    localStorage.setItem('user_id', currentUser.id);
-    localStorage.setItem('user_role', currentUser.role);
-    localStorage.setItem('user_name', currentUser.full_name || '');
+    document.getElementById('otp-verify-btn').style.display = 'none';
+    document.getElementById('otp-newpass-box').style.display = 'block';
+  }
 
-    if (currentRole === 'admin') {
-      showPage('admin-dashboard');
-    } else {
-      showPage('dashboard');
+  async function submitNewPasswordAfterOtp() {
+    hideErr('otp-error');
+    if (!pendingAuth) { showErr('otp-error', 'یه چیزی اشتباه شد — دوباره از اول امتحان کن'); return; }
+    const pass = document.getElementById('otp-newpass').value;
+    const pass2 = document.getElementById('otp-newpass2').value;
+    if (!pass || pass.length < 6) { showErr('otp-error', 'رمز عبور باید حداقل ۶ کاراکتر باشه'); return; }
+    if (pass !== pass2) { showErr('otp-error', 'تکرار رمز عبور یکی نیست'); return; }
+    showLoad('otp-loading', true);
+    const phone = pendingAuth.phone;
+    const email = phoneToEmail(phone);
+
+    // اول فرض می‌کنیم این حساب هنوز هیچ رمزی نداره (کاربرهای قدیمی/تستی)
+    const { data: rawSignUp, error: signUpErr } = await sb.auth.signUp({ email, password: pass });
+
+    if (!signUpErr) {
+      const signUpData = await ensureSessionAfterSignup(rawSignUp, email, pass);
+      if (signUpData) {
+        const { error: linkErr } = await sb.rpc('link_existing_account', { p_phone: phone });
+        if (linkErr) { showLoad('otp-loading', false); showErr('otp-error', 'خطا در وصل کردن حساب — دوباره تلاش کن'); return; }
+        const { data: profile } = await sb.from('users').select('*').eq('auth_uid', signUpData.user.id).maybeSingle();
+        showLoad('otp-loading', false);
+        pendingAuth = null;
+        if (profile) enterAsUser(profile);
+        return;
+      }
     }
+
+    // حساب از قبل رمز داشته → یعنی واقعاً «فراموشی رمز» بوده
+    const { error: resetErr } = await sb.rpc('reset_password_after_otp', { p_phone: phone, p_new_password: pass });
+    if (resetErr) { showLoad('otp-loading', false); showErr('otp-error', 'خطا در تغییر رمز — دوباره تلاش کن'); return; }
+    const { data: signInData, error: signInErr } = await sb.auth.signInWithPassword({ email, password: pass });
+    showLoad('otp-loading', false);
+    if (signInErr || !signInData.session) { showErr('otp-error', 'رمز عوض شد ولی ورود ناموفق بود — از صفحه‌ی ورود دوباره امتحان کن'); return; }
+    const { data: profile } = await sb.from('users').select('*').eq('auth_uid', signInData.user.id).maybeSingle();
+    pendingAuth = null;
+    if (profile) enterAsUser(profile);
   }
 
   // ===== داشبورد کارفرما =====
@@ -1397,7 +1506,7 @@
         else {
           list.innerHTML = projects.slice(0, 3).map(p => `
             <div class="project-card" onclick="openProjectDetail('${p.id}')">
-              <div class="project-top"><div class="project-title">${p.title}</div><div class="badge ${badgeCls(p.status)}">${badgeLabel(p.status)}</div></div>
+              <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge ${badgeCls(p.status)}">${badgeLabel(p.status)}</div></div>
               <div class="project-meta">${p.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای'}</div>
               <div class="project-price">${Number(p.budget).toLocaleString()} تومان</div>
             </div>`).join('');
@@ -1443,7 +1552,7 @@
     if (!filtered.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">پروژه‌ای پیدا نشد</div>'; return; }
     list.innerHTML = filtered.map(p => `
       <div class="project-card" onclick="openProjectDetail('${p.id}')">
-        <div class="project-top"><div class="project-title">${p.title}</div><div class="badge ${badgeCls(p.status)}">${badgeLabel(p.status)}</div></div>
+        <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge ${badgeCls(p.status)}">${badgeLabel(p.status)}</div></div>
         <div class="project-meta">${p.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای'}${p.platform ? ' · ' + p.platform : ''}</div>
         <div class="project-price">${Number(p.budget).toLocaleString()} تومان</div>
       </div>`).join('');
@@ -1503,10 +1612,10 @@
         reqList.innerHTML = reqs.map(r => `
           <div class="request-card">
             <div class="req-top">
-              <div style="font-weight:700;color:#f0e6d3">${r.admin?.full_name || 'ادمین'}</div>
+              <div style="font-weight:700;color:#f0e6d3">${escapeHtml(r.admin?.full_name || 'ادمین')}</div>
               <div class="req-price">${Number(r.price).toLocaleString()} تومان</div>
             </div>
-            <div class="req-msg">${r.message || ''}${r.deadline ? ' — زمان تحویل: ' + r.deadline : ''}</div>
+            <div class="req-msg">${escapeHtml(r.message || '')}${r.deadline ? ' — زمان تحویل: ' + escapeHtml(r.deadline) : ''}</div>
             ${r.status === 'pending' ? `
             <div class="req-actions">
               <button class="btn-accept" onclick="acceptProposal('${r.id}','${r.admin_id}','${id}',${r.price},'${(r.deadline||'').replace(/'/g,"")}')">✅ قبول</button>
@@ -1636,35 +1745,8 @@
   async function signContract() {
     if (!currentContractId) return;
     if (!confirm('قرارداد رو امضا می‌کنی؟ مبلغ از کیف‌پولت کسر و قفل می‌شه.')) return;
-
-    const { data: c } = await sb.from('contracts').select('*').eq('id', currentContractId).single();
-    const { data: wallet } = await sb.from('wallets').select('*').eq('user_id', currentUser.id).single();
-    if (!wallet || (wallet.balance || 0) < c.amount) {
-      alert('موجودی کیف‌پولت کافی نیست! اول شارژ کن.');
-      return;
-    }
-
-    await sb.from('wallets').update({
-      balance: wallet.balance - c.amount,
-      locked_balance: (wallet.locked_balance || 0) + c.amount
-    }).eq('user_id', currentUser.id);
-
-    await sb.from('transactions').insert({
-      user_id: currentUser.id,
-      project_id: currentContractProjectId,
-      type: 'locked',
-      amount: c.amount,
-      status: 'done'
-    });
-
-    await sb.from('contracts').update({ employer_signed: true }).eq('id', currentContractId);
-
-    const bothSigned = c.admin_signed === true;
-    if (bothSigned) {
-      await sb.from('contracts').update({ status: 'active' }).eq('id', currentContractId);
-      await sb.from('projects').update({ status: 'active' }).eq('id', currentContractProjectId);
-    }
-
+    const { error } = await sb.rpc('lock_contract_funds', { p_contract_id: currentContractId });
+    if (error) { alert('❌ ' + (error.message || 'موجودی کیف‌پولت کافی نیست! اول شارژ کن.')); return; }
     alert('✅ قرارداد امضا شد و مبلغ قفل شد!');
     showPage('projects');
   }
@@ -1672,8 +1754,8 @@
   async function rejectContract() {
     if (!currentContractId) return;
     if (!confirm('قرارداد رو رد می‌کنی؟')) return;
-    await sb.from('contracts').update({ status: 'rejected' }).eq('id', currentContractId);
-    await sb.from('projects').update({ admin_id: null }).eq('id', currentContractProjectId);
+    const { error } = await sb.rpc('reject_contract', { p_contract_id: currentContractId });
+    if (error) { alert('❌ ' + (error.message || 'خطا در رد قرارداد')); return; }
     goBack();
   }
 
@@ -1683,8 +1765,15 @@
 
   function escapeHtml(str) {
     const d = document.createElement('div');
-    d.textContent = str;
+    d.textContent = (str === null || str === undefined) ? '' : String(str);
     return d.innerHTML;
+  }
+
+  // فقط لینک‌های http/https رو معتبر می‌دونه، تا کسی نتونه با یه لینک
+  // «javascript:» به‌جای آدرس فایل، کد اجرا کنه.
+  function safeUrl(u) {
+    if (typeof u === 'string' && /^https?:\/\//i.test(u)) return u;
+    return '#';
   }
 
   function msgBubbleHTML(m) {
@@ -1744,8 +1833,8 @@
     if (!data || !data.length) { box.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز پروژه‌ی فعالی نداری</div>'; return; }
     box.innerHTML = data.map(p => `
       <div class="project-card" onclick="openEmployerChat('${p.id}')">
-        <div class="project-top"><div class="project-title">${p.title}</div><div class="badge badge-active">فعال</div></div>
-        <div class="project-meta">ادمین: ${p.admin?.full_name || '-'}</div>
+        <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge badge-active">فعال</div></div>
+        <div class="project-meta">ادمین: ${escapeHtml(p.admin?.full_name || '-')}</div>
       </div>`).join('');
   }
 
@@ -1869,10 +1958,10 @@
     if (!dels || !dels.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز تحویلی ندارید</div>'; return; }
     list.innerHTML = dels.map(d => `
       <div class="delivery-card">
-        <div style="font-weight:700;color:#f0e6d3;margin-bottom:6px">${d.title}</div>
-        ${d.description ? `<div style="font-size:12px;color:#8a7060;margin-bottom:8px">${d.description}</div>` : ''}
-        <div class="delivery-link"><div class="delivery-link-text">${d.file_link}</div></div>
-        <a href="${d.file_link}" target="_blank" style="display:block;text-align:center;font-size:12px;color:#e8956d;margin-top:4px">مشاهده فایل</a>
+        <div style="font-weight:700;color:#f0e6d3;margin-bottom:6px">${escapeHtml(d.title)}</div>
+        ${d.description ? `<div style="font-size:12px;color:#8a7060;margin-bottom:8px">${escapeHtml(d.description)}</div>` : ''}
+        <div class="delivery-link"><div class="delivery-link-text">${escapeHtml(d.file_link)}</div></div>
+        <a href="${safeUrl(d.file_link)}" target="_blank" style="display:block;text-align:center;font-size:12px;color:#e8956d;margin-top:4px">مشاهده فایل</a>
         <div style="margin-top:8px;font-size:12px;color:${d.status === 'approved' ? '#7bc67e' : d.status === 'rejected' ? '#e86d6d' : '#e8b56d'}">
           ${d.status === 'approved' ? '✅ تایید شده' : d.status === 'rejected' ? '❌ رد شده' : '⏳ در انتظار بررسی'}
         </div>
@@ -1882,29 +1971,8 @@
   async function releasePayment() {
     if (!currentEmployerProjectId) return;
     if (!confirm('پول رو آزاد می‌کنی؟ این عمل قابل بازگشت نیست.')) return;
-
-    const { data: c } = await sb.from('contracts').select('*').eq('project_id', currentEmployerProjectId).eq('status', 'active').maybeSingle();
-    if (!c) { alert('قراردادی فعال برای این پروژه پیدا نشد.'); return; }
-
-    const commission = Math.floor(c.amount * 0.1);
-    const netAmount = c.amount - commission;
-
-    const { data: employerWallet } = await sb.from('wallets').select('*').eq('user_id', currentUser.id).single();
-    await sb.from('wallets').update({
-      locked_balance: Math.max(0, (employerWallet.locked_balance || 0) - c.amount)
-    }).eq('user_id', currentUser.id);
-
-    const { data: adminWallet } = await sb.from('wallets').select('*').eq('user_id', c.admin_id).single();
-    await sb.from('wallets').update({
-      balance: (adminWallet?.balance || 0) + netAmount
-    }).eq('user_id', c.admin_id);
-
-    await sb.from('transactions').insert({ user_id: c.admin_id, project_id: currentEmployerProjectId, type: 'release', amount: netAmount, status: 'done' });
-    await sb.from('transactions').insert({ project_id: currentEmployerProjectId, type: 'commission', amount: commission, status: 'done' });
-
-    await sb.from('contracts').update({ status: 'done' }).eq('id', c.id);
-    await sb.from('projects').update({ status: 'done' }).eq('id', currentEmployerProjectId);
-
+    const { error } = await sb.rpc('release_project_payment', { p_project_id: currentEmployerProjectId });
+    if (error) { alert('❌ ' + (error.message || 'خطا در آزادسازی پول')); return; }
     alert('✅ پرداخت انجام شد! مبلغ به ادمین واریز شد.');
     showPage('projects');
   }
@@ -1934,7 +2002,7 @@
         else {
           activeList.innerHTML = activeProjects.map(p => `
             <div class="project-card">
-              <div class="project-top"><div class="project-title">${p.title}</div><div class="badge badge-active">فعال</div></div>
+              <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge badge-active">فعال</div></div>
               <div class="project-meta">${p.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای'}</div>
               <div class="project-price">${Number(p.budget * 0.9).toLocaleString()} تومان</div>
               <div style="display:flex;gap:8px;margin-top:10px;border-top:1px solid #3d2b20;padding-top:10px">
@@ -1955,10 +2023,10 @@
       else {
         newList.innerHTML = newProjects.map(p => `
           <div class="available-card">
-            <div class="project-top"><div class="project-title">${p.title}</div><div class="badge badge-new">جدید</div></div>
+            <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge badge-new">جدید</div></div>
             <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
               <span class="info-tag">${p.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای'}</span>
-              ${p.platform ? `<span class="info-tag">${p.platform}</span>` : ''}
+              ${p.platform ? `<span class="info-tag">${escapeHtml(p.platform)}</span>` : ''}
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center">
               <div class="project-price">${Number(p.budget).toLocaleString()} تومان</div>
@@ -1995,11 +2063,11 @@
     if (!filtered.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">پروژه‌ای پیدا نشد</div>'; return; }
     list.innerHTML = filtered.map(p => `
       <div class="available-card">
-        <div class="project-top"><div class="project-title">${p.title}</div><div class="badge badge-new">جدید</div></div>
-        <div style="font-size:13px;color:#8a7060;margin-bottom:10px;line-height:1.5">${(p.description || '').substring(0, 80)}${p.description && p.description.length > 80 ? '...' : ''}</div>
+        <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge badge-new">جدید</div></div>
+        <div style="font-size:13px;color:#8a7060;margin-bottom:10px;line-height:1.5">${escapeHtml((p.description || '').substring(0, 80))}${p.description && p.description.length > 80 ? '...' : ''}</div>
         <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
           <span class="info-tag">${p.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای'}</span>
-          ${p.platform ? `<span class="info-tag">${p.platform}</span>` : ''}
+          ${p.platform ? `<span class="info-tag">${escapeHtml(p.platform)}</span>` : ''}
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div class="project-price">${Number(p.budget).toLocaleString()} تومان</div>
@@ -2082,7 +2150,7 @@
     if (!filtered.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز پروژه‌ای ندارید</div>'; return; }
     list.innerHTML = filtered.map(p => `
       <div class="project-card">
-        <div class="project-top"><div class="project-title">${p.title}</div><div class="badge ${badgeCls(p.status)}">${badgeLabel(p.status)}</div></div>
+        <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge ${badgeCls(p.status)}">${badgeLabel(p.status)}</div></div>
         <div class="project-meta">${p.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای'}</div>
         <div class="project-price">${Number(p.budget * 0.9).toLocaleString()} تومان (دریافتی شما)</div>
         <div style="display:flex;gap:8px;margin-top:10px;border-top:1px solid #3d2b20;padding-top:10px">
@@ -2128,25 +2196,17 @@
   async function signAdminContract() {
     if (!currentContractId) return;
     if (!confirm('قرارداد رو امضا می‌کنی؟')) return;
-
-    const { data: c } = await sb.from('contracts').select('*').eq('id', currentContractId).single();
-    await sb.from('contracts').update({ admin_signed: true }).eq('id', currentContractId);
-
-    const bothSigned = c.employer_signed === true;
-    if (bothSigned) {
-      await sb.from('contracts').update({ status: 'active' }).eq('id', currentContractId);
-      await sb.from('projects').update({ status: 'active' }).eq('id', currentContractProjectId);
-    }
-
-    alert(bothSigned ? '✅ قرارداد کامل شد و پروژه فعال شد!' : '✅ قرارداد امضا شد! در انتظار امضای کارفرما.');
+    const { data: newStatus, error } = await sb.rpc('sign_contract_as_admin', { p_contract_id: currentContractId });
+    if (error) { alert('❌ ' + (error.message || 'خطا در امضای قرارداد')); return; }
+    alert(newStatus === 'active' ? '✅ قرارداد کامل شد و پروژه فعال شد!' : '✅ قرارداد امضا شد! در انتظار امضای کارفرما.');
     showPage('admin-my-projects');
   }
 
   async function rejectAdminContract() {
     if (!currentContractId) return;
     if (!confirm('قرارداد رو رد می‌کنی؟')) return;
-    await sb.from('contracts').update({ status: 'rejected' }).eq('id', currentContractId);
-    await sb.from('projects').update({ admin_id: null }).eq('id', currentContractProjectId);
+    const { error } = await sb.rpc('reject_contract', { p_contract_id: currentContractId });
+    if (error) { alert('❌ ' + (error.message || 'خطا در رد قرارداد')); return; }
     goBack();
   }
 
@@ -2172,8 +2232,8 @@
     if (!data || !data.length) { box.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز پروژه‌ی فعالی نداری</div>'; return; }
     box.innerHTML = data.map(p => `
       <div class="project-card" onclick="openAdminChat('${p.id}')">
-        <div class="project-top"><div class="project-title">${p.title}</div><div class="badge badge-active">فعال</div></div>
-        <div class="project-meta">کارفرما: ${p.employer?.full_name || '-'}</div>
+        <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge badge-active">فعال</div></div>
+        <div class="project-meta">کارفرما: ${escapeHtml(p.employer?.full_name || '-')}</div>
       </div>`).join('');
   }
 
@@ -2269,11 +2329,11 @@
     if (!dels || !dels.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز تحویلی ندارید</div>'; return; }
     list.innerHTML = dels.map(d => `
       <div class="delivery-card">
-        <div style="font-weight:700;color:#f0e6d3;margin-bottom:6px">${d.title}</div>
-        ${d.description ? `<div style="font-size:12px;color:#8a7060;margin-bottom:8px">${d.description}</div>` : ''}
-        <div class="delivery-link"><div class="delivery-link-text">${d.file_link}</div></div>
+        <div style="font-weight:700;color:#f0e6d3;margin-bottom:6px">${escapeHtml(d.title)}</div>
+        ${d.description ? `<div style="font-size:12px;color:#8a7060;margin-bottom:8px">${escapeHtml(d.description)}</div>` : ''}
+        <div class="delivery-link"><div class="delivery-link-text">${escapeHtml(d.file_link)}</div></div>
         <div style="margin-top:8px;font-size:12px;color:${d.status === 'approved' ? '#7bc67e' : d.status === 'rejected' ? '#e86d6d' : '#e8b56d'}">
-          ${d.status === 'approved' ? '✅ تایید شده' : d.status === 'rejected' ? '❌ رد شده' + (d.reject_reason ? ' — ' + d.reject_reason : '') : '⏳ در انتظار بررسی کارفرما'}
+          ${d.status === 'approved' ? '✅ تایید شده' : d.status === 'rejected' ? '❌ رد شده' + (d.reject_reason ? ' — ' + escapeHtml(d.reject_reason) : '') : '⏳ در انتظار بررسی کارفرما'}
         </div>
       </div>`).join('');
   }
@@ -2346,35 +2406,35 @@
   function showWithdrawModal() { document.getElementById('withdraw-modal').classList.add('show'); }
   function hideWithdrawModal() { document.getElementById('withdraw-modal').classList.remove('show'); }
 
-  function doWithdraw() {
+  async function doWithdraw() {
     const amount = document.getElementById('withdraw-amount').value;
     const card = document.getElementById('withdraw-card').value;
     hideErr('withdraw-error');
     if (!amount || !card || card.length !== 16) { showErr('withdraw-error', 'مبلغ و شماره کارت ۱۶ رقمی رو وارد کن'); return; }
+    const { error } = await sb.rpc('request_withdrawal', { p_amount: parseInt(amount), p_card: card });
+    if (error) { showErr('withdraw-error', error.message || 'خطا در ثبت درخواست برداشت'); return; }
     alert('✅ درخواست برداشت ثبت شد!\nمبلغ تا ۲۴ ساعت به کارت واریز میشه.');
     hideWithdrawModal();
+    loadAdminWallet();
   }
 
   // ===== خروج =====
-  function logout() {
+  async function logout() {
     if (!confirm('مطمئنی می‌خوای خارج بشی؟')) return;
+    await sb.auth.signOut();
     currentUser = null;
     currentRole = null;
-    localStorage.clear();
     showPage('landing');
   }
 
   // ===== init =====
-  window.addEventListener('load', () => {
-    const savedId = localStorage.getItem('user_id');
-    const savedRole = localStorage.getItem('user_role');
-    const savedName = localStorage.getItem('user_name');
-    if (savedId && savedRole) {
-      currentUser = { id: savedId, role: savedRole, full_name: savedName };
-      currentRole = savedRole;
-      if (savedRole === 'admin') showPage('admin-dashboard');
-      else showPage('dashboard');
-    }
+  // نشست از خود Supabase Auth خونده می‌شه (امضاشده و امن)، نه از localStorage خام —
+  // چون قبلاً هرکسی می‌تونست با تغییر localStorage خودش رو جای هرکسی دیگه جا بزنه.
+  window.addEventListener('load', async () => {
+    const { data } = await sb.auth.getSession();
+    if (!data.session) return;
+    const { data: profile } = await sb.from('users').select('*').eq('auth_uid', data.session.user.id).maybeSingle();
+    if (profile && !profile.banned) enterAsUser(profile);
   });
 </script>
 </body>
