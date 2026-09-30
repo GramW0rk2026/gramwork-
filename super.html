@@ -678,6 +678,18 @@
   let currentActionType = null;
   let currentActionTarget = null;
 
+  // ===== امنیت نمایش: کاربرا هرچی بخوان تو اسم/عنوان/توضیح/پیام‌شون می‌نویسن —
+  // این دو تابع جلوی اجرای کد مخفی (XSS) و لینک‌های javascript: رو می‌گیرن =====
+  function escapeHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = (str === null || str === undefined) ? '' : String(str);
+    return d.innerHTML;
+  }
+  function safeUrl(u) {
+    if (typeof u === 'string' && /^https?:\/\//i.test(u)) return u;
+    return '#';
+  }
+
   // ===== لاگین (Supabase Auth واقعی — رمز دیگه توی کد نیست) =====
   async function superLogin() {
     const email = document.getElementById('super-email').value.trim();
@@ -836,8 +848,8 @@
         <div class="user-top">
           <div class="avatar">${u.role === 'employer' ? '👨‍💼' : '👨‍💻'}</div>
           <div style="flex:1">
-            <div class="user-name">${u.full_name || 'بدون نام'}</div>
-            <div class="user-meta">${u.phone || '-'}</div>
+            <div class="user-name">${escapeHtml(u.full_name || 'بدون نام')}</div>
+            <div class="user-meta">${escapeHtml(u.phone || '-')}</div>
             <div class="user-badges">
               <div class="ub ${u.role === 'employer' ? 'ub-employer' : 'ub-admin'}">${u.role === 'employer' ? 'کارفرما' : 'ادمین'}</div>
               ${u.verified ? '<div class="ub ub-verified">✅ تایید</div>' : '<div class="ub ub-warning">⏳ تایید نشده</div>'}
@@ -900,10 +912,10 @@
       const [bc, bl] = badgeMap[p.status] || ['badge-pending', p.status];
       return `<div class="project-card">
         <div class="project-top"><div class="project-id">پروژه</div><div class="badge ${bc}">${bl}</div></div>
-        <div class="project-title">${p.title}</div>
+        <div class="project-title">${escapeHtml(p.title)}</div>
         <div class="project-parties">
-          <div class="party-tag">👨‍💼 ${p.employer?.full_name || '-'}</div>
-          ${p.admin ? `<div class="party-tag">👨‍💻 ${p.admin.full_name}</div>` : '<div class="party-tag">⏳ بدون ادمین</div>'}
+          <div class="party-tag">👨‍💼 ${escapeHtml(p.employer?.full_name || '-')}</div>
+          ${p.admin ? `<div class="party-tag">👨‍💻 ${escapeHtml(p.admin.full_name)}</div>` : '<div class="party-tag">⏳ بدون ادمین</div>'}
         </div>
         ${p.status === 'dispute' ? '<div class="dispute-box">⚠️ این پروژه نیاز به داوری دارد</div>' : ''}
         <div class="project-info">
@@ -928,13 +940,16 @@
 
   async function cancelProject(id) {
     if (!confirm('پروژه لغو و وجه برگشت داده بشه؟')) return;
-    await sb.from('projects').update({ status: 'canceled' }).eq('id', id);
-    alert('🚫 پروژه لغو شد!');
+    const { error } = await sb.rpc('superadmin_cancel_project', { p_project_id: id });
+    if (error) { alert('❌ ' + (error.message || 'خطا در لغو پروژه')); return; }
+    alert('🚫 پروژه لغو شد و وجه قفل‌شده (اگر بود) برگشت داده شد!');
     loadSuperProjects();
   }
 
   async function releaseProject(id) {
     if (!confirm('پول این پروژه آزاد بشه؟')) return;
+    const { error } = await sb.rpc('superadmin_release_project', { p_project_id: id });
+    if (error) { alert('❌ ' + (error.message || 'خطا در آزادسازی پول')); return; }
     alert('💰 پول آزاد شد!');
     loadSuperProjects();
   }
@@ -978,10 +993,13 @@
     msgs.scrollTop = msgs.scrollHeight;
   }
 
-  function makeVerdict(type) {
+  async function makeVerdict(type) {
     const reason = document.getElementById('verdict-reason').value.trim();
     if (!reason) { alert('دلیل تصمیم رو بنویس!'); return; }
+    if (!currentArbProject) return;
     if (!confirm('مطمئنی؟ این تصمیم برگشت‌پذیر نیست.')) return;
+    const { error } = await sb.rpc('superadmin_arbitration_verdict', { p_project_id: currentArbProject.id, p_verdict: type, p_reason: reason });
+    if (error) { alert('❌ ' + (error.message || 'خطا در ثبت تصمیم')); return; }
     const msgs = { employer: '✅ وجه به کارفرما برگشت داده شد.', admin: '✅ پول برای ادمین آزاد شد.', split: '⚖️ وجه تقسیم شد.', cancel: '🚫 قرارداد لغو و وجه برگشت داده شد.' };
     alert(msgs[type]);
     closeArb();
@@ -1015,7 +1033,7 @@
             <div class="tx-icon ${t.type || 'charge'}"><span>${iconMap[t.type] || '💰'}</span></div>
             <div>
               <div class="tx-title">${t.type === 'charge' ? 'شارژ کیف پول' : t.type === 'locked' ? 'قفل قرارداد' : t.type === 'withdraw' ? 'درخواست برداشت' : 'کمیسیون'}</div>
-              <div class="tx-user">${t.user?.full_name || '-'}</div>
+              <div class="tx-user">${escapeHtml(t.user?.full_name || '-')}</div>
             </div>
           </div>
           <div class="tx-amount ${t.type === 'charge' ? 'amount-plus' : t.type === 'locked' ? 'amount-locked' : 'amount-minus'}">${t.type === 'charge' ? '+' : '-'}${Number(t.amount || 0).toLocaleString()}</div>
@@ -1023,23 +1041,22 @@
         <div class="tx-date">${new Date(t.created_at).toLocaleDateString('fa-IR')}</div>
         ${t.type === 'charge' && t.status === 'pending' && t.receipt_link ? `<div style="margin-top:8px"><img src="${t.receipt_link}" style="width:100%;max-width:220px;border-radius:10px;border:1px solid #2d1f10;cursor:pointer" onclick="window.open('${t.receipt_link}','_blank')" /></div>` : ''}
         ${t.type === 'charge' && t.status === 'pending' ? `<div style="display:flex;gap:8px;margin-top:8px"><button class="action-btn" style="background:#2d4a1e;color:#7bc67e" onclick="approveCharge('${t.id}','${t.user_id}',${t.amount})">✅ تایید و شارژ کیف‌پول</button><button class="action-btn" style="background:#4a1e1e;color:#e86d6d" onclick="rejectCharge('${t.id}')">❌ رد درخواست</button></div>` : ''}
-        ${t.type === 'locked' ? `<div style="display:flex;gap:8px;margin-top:8px"><button class="action-btn" style="background:#1e3a4a;color:#6db8e8" onclick="releaseTx('${t.id}')">💰 آزادسازی</button><button class="action-btn" style="background:#4a1e1e;color:#e86d6d" onclick="refundTx('${t.id}')">↩️ برگشت وجه</button></div>` : ''}
+        ${t.type === 'locked' ? `<div style="display:flex;gap:8px;margin-top:8px"><button class="action-btn" style="background:#1e3a4a;color:#6db8e8" onclick="releaseTx('${t.project_id}')">💰 آزادسازی</button><button class="action-btn" style="background:#4a1e1e;color:#e86d6d" onclick="refundTx('${t.project_id}')">↩️ برگشت وجه</button></div>` : ''}
       </div>`).join('');
   }
 
   async function approveCharge(txId, userId, amount) {
     if (!confirm('شارژ تایید و به کیف‌پول کاربر اضافه بشه؟')) return;
-    const { data: wallet } = await sb.from('wallets').select('balance').eq('user_id', userId).maybeSingle();
-    const newBalance = (wallet?.balance || 0) + Number(amount);
-    await sb.from('wallets').update({ balance: newBalance }).eq('user_id', userId);
-    await sb.from('transactions').update({ status: 'done' }).eq('id', txId);
+    const { error } = await sb.rpc('superadmin_approve_charge', { p_transaction_id: txId });
+    if (error) { alert('❌ ' + (error.message || 'خطا در تایید شارژ')); return; }
     alert('✅ کیف‌پول شارژ شد!');
     loadTransactions();
   }
 
   async function rejectCharge(txId) {
     if (!confirm('این درخواست شارژ رد بشه؟')) return;
-    await sb.from('transactions').update({ status: 'rejected' }).eq('id', txId);
+    const { error } = await sb.rpc('superadmin_reject_charge', { p_transaction_id: txId });
+    if (error) { alert('❌ ' + (error.message || 'خطا در رد درخواست')); return; }
     alert('درخواست رد شد.');
     loadTransactions();
   }
@@ -1051,16 +1068,18 @@
     renderTx();
   }
 
-  async function releaseTx(id) {
+  async function releaseTx(projectId) {
     if (!confirm('پول آزاد بشه؟')) return;
-    await sb.from('transactions').update({ status: 'done', type: 'release' }).eq('id', id);
+    const { error } = await sb.rpc('superadmin_release_project', { p_project_id: projectId });
+    if (error) { alert('❌ ' + (error.message || 'خطا در آزادسازی پول')); return; }
     alert('💰 پول آزاد شد!');
     loadTransactions();
   }
 
-  async function refundTx(id) {
+  async function refundTx(projectId) {
     if (!confirm('وجه برگشت داده بشه؟')) return;
-    await sb.from('transactions').update({ status: 'refunded' }).eq('id', id);
+    const { error } = await sb.rpc('superadmin_refund_project', { p_project_id: projectId });
+    if (error) { alert('❌ ' + (error.message || 'خطا در برگشت وجه')); return; }
     alert('↩️ وجه برگشت داده شد!');
     loadTransactions();
   }
@@ -1073,9 +1092,13 @@
     else {
       list.innerHTML = pending.map(t => `
         <div class="withdraw-item">
-          <div><div class="withdraw-name">${t.user?.full_name || '-'}</div></div>
+          <div>
+            <div class="withdraw-name">${escapeHtml(t.user?.full_name || '-')}</div>
+            <div class="withdraw-meta" style="direction:ltr;text-align:right">${escapeHtml(t.card_number || '-')}</div>
+          </div>
           <div class="withdraw-amount">${Number(t.amount || 0).toLocaleString()} ت</div>
           <button class="withdraw-pay-btn" onclick="payWithdraw('${t.id}')">پرداخت</button>
+          <button class="withdraw-pay-btn" style="background:#4a1e1e;color:#e86d6d;margin-right:6px" onclick="rejectWithdraw('${t.id}')">رد</button>
         </div>`).join('');
     }
     document.getElementById('withdraw-modal').classList.add('show');
@@ -1085,8 +1108,18 @@
 
   async function payWithdraw(id) {
     if (!confirm('این برداشت پرداخت بشه؟')) return;
-    await sb.from('transactions').update({ status: 'done' }).eq('id', id);
+    const { error } = await sb.rpc('superadmin_pay_withdrawal', { p_transaction_id: id });
+    if (error) { alert('❌ ' + (error.message || 'خطا در پرداخت')); return; }
     alert('✅ پرداخت انجام شد!');
+    hideWithdrawModal();
+    loadTransactions();
+  }
+
+  async function rejectWithdraw(id) {
+    if (!confirm('این درخواست برداشت رد بشه؟ مبلغ به کیف‌پول ادمین برمی‌گرده.')) return;
+    const { error } = await sb.rpc('superadmin_reject_withdrawal', { p_transaction_id: id });
+    if (error) { alert('❌ ' + (error.message || 'خطا در رد درخواست')); return; }
+    alert('درخواست رد شد و مبلغ برگشت داده شد.');
     hideWithdrawModal();
     loadTransactions();
   }
@@ -1095,7 +1128,10 @@
     const pending = allTx.filter(t => t.type === 'withdraw' && t.status === 'pending');
     if (!pending.length) { alert('هیچ درخواستی وجود ندارد'); return; }
     if (!confirm('همه ' + pending.length + ' درخواست پرداخت بشن؟')) return;
-    for (const t of pending) { await sb.from('transactions').update({ status: 'done' }).eq('id', t.id); }
+    for (const t of pending) {
+      const { error } = await sb.rpc('superadmin_pay_withdrawal', { p_transaction_id: t.id });
+      if (error) { alert('❌ خطا در پرداخت یکی از درخواست‌ها — بقیه ادامه پیدا می‌کنه: ' + error.message); }
+    }
     alert('✅ همه پرداخت‌ها انجام شد!');
     hideWithdrawModal();
     loadTransactions();
@@ -1121,14 +1157,14 @@
       const [bc, bl] = badgeMap[r.status] || ['badge-new', r.status];
       return `<div class="report-card ${r.status === 'new' ? 'urgent' : ''}">
         <div class="report-top">
-          <div><div class="report-type">${r.type || 'سایر'}</div><div class="report-title">${r.description?.substring(0, 50) || 'گزارش'}</div></div>
+          <div><div class="report-type">${escapeHtml(r.type || 'سایر')}</div><div class="report-title">${escapeHtml((r.description || '').substring(0, 50)) || 'گزارش'}</div></div>
           <div class="badge ${bc}">${bl}</div>
         </div>
         <div class="report-parties">
-          <div class="party-tag" style="background:#0f0a08;border-color:#2d1f10">📢 ${r.reporter?.full_name || '-'}</div>
-          <div class="party-tag" style="background:#0f0a08;border-color:#2d1f10">⚠️ ${r.reported?.full_name || '-'}</div>
+          <div class="party-tag" style="background:#0f0a08;border-color:#2d1f10">📢 ${escapeHtml(r.reporter?.full_name || '-')}</div>
+          <div class="party-tag" style="background:#0f0a08;border-color:#2d1f10">⚠️ ${escapeHtml(r.reported?.full_name || '-')}</div>
         </div>
-        <div class="report-desc">${r.description || '-'}</div>
+        <div class="report-desc">${escapeHtml(r.description || '-')}</div>
         <div class="report-time">⏰ ${new Date(r.created_at).toLocaleDateString('fa-IR')}</div>
         ${r.status !== 'resolved' ? `
         <div class="report-actions">
@@ -1178,30 +1214,35 @@
     const threads = Object.entries(byUser).map(([uid, t]) => ({ uid, ...t }));
     setText('m-support-sub', threads.length + ' مکالمه');
     setText('m-support-b', threads.filter(t => t.last.sender_role === 'user').length);
+    supportThreadsById = {};
+    threads.forEach(t => { supportThreadsById[t.uid] = t.user?.full_name || 'کاربر'; });
 
     list.innerHTML = threads.map(t => `
-      <div class="user-card" style="cursor:pointer" onclick="openSupportThread('${t.uid}','${(t.user?.full_name || 'کاربر').replace(/'/g, '')}')">
+      <div class="user-card" style="cursor:pointer" onclick="openSupportThread('${t.uid}')">
         <div class="user-top">
           <div class="avatar">👤</div>
           <div style="flex:1">
-            <div class="user-name">${t.user?.full_name || 'کاربر'}</div>
-            <div class="user-meta">${t.user?.phone || ''}</div>
-            <div style="font-size:12px;color:#8a7060;margin-top:4px">${t.last.sender_role === 'user' ? '🔴 ' : ''}${t.last.image_link ? '📎 عکس' : (t.last.content || '').substring(0, 40)}</div>
+            <div class="user-name">${escapeHtml(t.user?.full_name || 'کاربر')}</div>
+            <div class="user-meta">${escapeHtml(t.user?.phone || '')}</div>
+            <div style="font-size:12px;color:#8a7060;margin-top:4px">${t.last.sender_role === 'user' ? '🔴 ' : ''}${t.last.image_link ? '📎 عکس' : escapeHtml((t.last.content || '').substring(0, 40))}</div>
           </div>
         </div>
       </div>`).join('');
   }
 
+  let supportThreadsById = {};
+
   function supportMsgHTML(m) {
     const mine = m.sender_role !== 'user';
     const time = new Date(m.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
     const body = m.image_link
-      ? `<img src="${m.image_link}" style="max-width:180px;border-radius:10px;display:block;cursor:pointer" onclick="window.open('${m.image_link}','_blank')" />`
-      : (m.content || '');
+      ? `<img src="${safeUrl(m.image_link)}" style="max-width:180px;border-radius:10px;display:block;cursor:pointer" onclick="window.open(this.src,'_blank')" />`
+      : escapeHtml(m.content || '');
     return `<div class="chat-msg"><div class="chat-msg-sender">${mine ? 'سوپرادمین' : 'کاربر'} — ${time}</div><div class="chat-msg-bubble ${mine ? 'msg-super' : 'msg-other'}">${body}</div></div>`;
   }
 
-  async function openSupportThread(userId, userName) {
+  async function openSupportThread(userId) {
+    const userName = supportThreadsById[userId] || 'کاربر';
     currentSupportUserId = userId;
     setText('support-thread-name', userName);
     const { data: msgs } = await sb.from('support_messages').select('*').eq('user_id', userId).order('created_at', { ascending: true });
