@@ -1279,7 +1279,7 @@
 
   // شماره موبایل رو به یه ایمیل ساختگی تبدیل می‌کنه تا بشه از خود Supabase Auth
   // (همون سیستمی که سوپرادمین باهاش وارد می‌شه) برای کاربرای عادی هم استفاده کرد.
-  function phoneToEmail(phone) { return phone + '@gramwork.local'; }
+  function phoneToEmail(phone) { return phone + '@gramwork.ir'; }
 
   // فقط برای انتقال بین «فرم ثبت‌نام» و «تأیید OTP» در همون تب مرورگر — رمز
   // هیچ‌وقت تو localStorage یا دیتابیس خام ذخیره نمی‌شه.
@@ -1453,6 +1453,14 @@
 
     // اول فرض می‌کنیم این حساب هنوز هیچ رمزی نداره (کاربرهای قدیمی/تستی)
     const { data: rawSignUp, error: signUpErr } = await sb.auth.signUp({ email, password: pass });
+
+    // اگه ساخت حساب به‌خاطر دلیلی غیر از «از قبل وجود داره» خطا داد، همین‌جا خطای واقعی رو نشون بده
+    const alreadyExists = signUpErr && (signUpErr.code === 'user_already_exists' || /already/i.test(signUpErr.message || ''));
+    if (signUpErr && !alreadyExists) {
+      showLoad('otp-loading', false);
+      showErr('otp-error', 'خطا در ساخت حساب: ' + (signUpErr.message || 'دوباره تلاش کن'));
+      return;
+    }
 
     if (!signUpErr) {
       const signUpData = await ensureSessionAfterSignup(rawSignUp, email, pass);
