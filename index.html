@@ -3,217 +3,322 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>گرام ورک</title>
+  <title>گرام ورک | بازار کار ادمین و کارفرمای شبکه‌های اجتماعی</title>
+  <meta name="description" content="گرام ورک بازار کار دیجیتال ایرانی است: کارفرما برای پیج و کانال خود ادمین متخصص پیدا می‌کند و ادمین پروژه می‌گیرد. قرارداد آنلاین و پرداخت امن با قفل پول." />
+  <link rel="canonical" href="https://gramwork.ir/" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="گرام ورک" />
+  <meta property="og:locale" content="fa_IR" />
+  <meta property="og:title" content="گرام ورک | بازار کار ادمین و کارفرمای شبکه‌های اجتماعی" />
+  <meta property="og:description" content="ادمین مناسب، کارفرمای مناسب — قرارداد آنلاین و پرداخت امن با قفل پول." />
+  <meta property="og:url" content="https://gramwork.ir/" />
+  <meta name="twitter:card" content="summary" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"گرام ورک","url":"https://gramwork.ir/","inLanguage":"fa"},{"@type":"Organization","name":"گرام ورک","url":"https://gramwork.ir/","logo":"https://gramwork.ir/favicon.svg"}]}</script>
+  <meta name="theme-color" content="#1a1210" />
+  <script>try{var t=localStorage.getItem('gw_theme');if(t)document.documentElement.setAttribute('data-theme',t);var a=localStorage.getItem('gw_accent_'+(t||'dark'));if(a&&/^#[0-9a-f]{6}$/i.test(a))document.documentElement.style.setProperty('--accent',a);}catch(e){}</script>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #1a1210; color: #f0e6d3; min-height: 100vh; }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
     /* ===== مشترک ===== */
     .page { display: none; min-height: 100vh; }
     .page.active { display: block; }
     .page-center { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
-    .logo { font-size: 32px; font-weight: 900; color: #e8956d; }
-    .logo span { color: #c4703f; }
+    .logo { font-size: 32px; font-weight: 900; color: var(--accent); }
+    .logo span { color: var(--accent2); }
     .btn { width: 100%; max-width: 360px; padding: 15px; border-radius: 14px; border: none; font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 12px; font-family: inherit; display: block; }
-    .btn-primary { background: #e8956d; color: #1a1210; }
-    .btn-secondary { background: transparent; border: 1px solid #3d2b20; color: #e8956d; }
-    .btn-danger { background: transparent; border: 1px solid #e86d6d44; color: #e86d6d; }
-    .btn:disabled { background: #3d2b20; color: #8a7060; cursor: not-allowed; }
+    .btn-primary { background: var(--accent); color:var(--on-accent); }
+    .btn-secondary { background: transparent; border: 1px solid var(--line); color: var(--accent); }
+    .btn-danger { background: transparent; border: 1px solid color-mix(in srgb, var(--err) 27%, transparent); color: var(--err); }
+    .btn:disabled { background: var(--line); color: var(--muted); cursor: not-allowed; }
     .input-group { margin-bottom: 16px; width: 100%; max-width: 360px; }
-    .input-group label { display: block; font-size: 13px; color: #a08060; margin-bottom: 8px; }
-    .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 13px 16px; background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 12px; color: #f0e6d3; font-size: 14px; outline: none; text-align: right; font-family: inherit; }
+    .input-group label { display: block; font-size: 13px; color: var(--muted2); margin-bottom: 8px; }
+    .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 13px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; color: var(--text); font-size: 14px; outline: none; text-align: right; font-family: inherit; }
     .input-group textarea { resize: none; height: 90px; }
-    .input-group input:focus, .input-group textarea:focus, .input-group select:focus { border-color: #e8956d; }
-    .input-group select option { background: #2a1f1a; }
-    .error-box { background: #3a1e1e; border: 1px solid #e86d6d44; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #e86d6d; margin-bottom: 12px; display: none; width: 100%; max-width: 360px; text-align: center; }
-    .success-box { background: #1e3a1e; border: 1px solid #7bc67e44; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #7bc67e; margin-bottom: 12px; display: none; width: 100%; max-width: 360px; text-align: center; }
-    .loading-box { text-align: center; font-size: 13px; color: #8a7060; margin-bottom: 12px; display: none; }
+    .input-group input:focus, .input-group textarea:focus, .input-group select:focus { border-color: var(--accent); }
+    .input-group select option { background: var(--surface); }
+    .error-box { background: var(--err-bg); border: 1px solid color-mix(in srgb, var(--err) 27%, transparent); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--err); margin-bottom: 12px; display: none; width: 100%; max-width: 360px; text-align: center; }
+    .success-box { background: var(--ok-bg2); border: 1px solid color-mix(in srgb, var(--ok) 27%, transparent); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--ok); margin-bottom: 12px; display: none; width: 100%; max-width: 360px; text-align: center; }
+    .loading-box { text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 12px; display: none; }
     .badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
-    .badge-active { background: #2d4a1e; color: #7bc67e; }
-    .badge-pending { background: #4a3010; color: #e8b56d; }
-    .badge-done { background: #1e3a4a; color: #6db8e8; }
-    .badge-canceled { background: #3a1e1e; color: #e86d6d; }
-    .badge-new { background: #1e2a4a; color: #6d8de8; }
-    .card { background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+    .badge-active { background: var(--ok-bg); color: var(--ok); }
+    .badge-pending { background: var(--warn-bg); color: var(--warn); }
+    .badge-done { background: var(--info-bg); color: var(--info); }
+    .badge-canceled { background: var(--err-bg); color: var(--err); }
+    .badge-new { background: var(--info2-bg); color: var(--info2); }
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
     .section { padding: 0 16px; margin-bottom: 20px; }
     .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .section-title { font-size: 15px; font-weight: 700; color: #f0e6d3; }
-    .see-all { font-size: 13px; color: #e8956d; cursor: pointer; }
-    .header { background: #2a1f1a; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3d2b20; position: sticky; top: 0; z-index: 50; }
-    .header-title { font-size: 17px; font-weight: 700; color: #f0e6d3; }
-    .back-btn { font-size: 22px; color: #e8956d; cursor: pointer; }
-    .navbar { position: fixed; bottom: 0; width: 100%; background: #2a1f1a; border-top: 1px solid #3d2b20; display: flex; justify-content: space-around; padding: 10px 0; z-index: 50; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; color: #8a7060; font-size: 10px; }
-    .nav-item.active { color: #e8956d; }
+    .section-title { font-size: 15px; font-weight: 700; color: var(--text); }
+    .see-all { font-size: 13px; color: var(--accent); cursor: pointer; }
+    .header { background: var(--surface); padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; }
+    .header-title { font-size: 17px; font-weight: 700; color: var(--text); }
+    .back-btn { font-size: 22px; color: var(--accent); cursor: pointer; }
+    .navbar { position: fixed; bottom: 0; width: 100%; background: var(--surface); border-top: 1px solid var(--line); display: flex; justify-content: space-around; padding: 10px 0; z-index: 50; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; color: var(--muted); font-size: 10px; }
+    .nav-item.active { color: var(--accent); }
     .nav-icon { font-size: 20px; }
     .page-content { padding-bottom: 80px; }
-    .wallet-card { margin: 16px; background: linear-gradient(135deg, #3d2010, #2a1505); border: 1px solid #c4703f; border-radius: 20px; padding: 20px; }
-    .wallet-label { font-size: 13px; color: #a08060; margin-bottom: 6px; }
-    .wallet-amount { font-size: 28px; font-weight: 900; color: #e8956d; margin-bottom: 4px; }
-    .wallet-amount span { font-size: 14px; color: #8a7060; }
-    .wallet-note { font-size: 12px; color: #8a7060; margin-bottom: 16px; }
-    .wallet-note b { color: #e8b56d; }
+    .wallet-card { margin: 16px; background: linear-gradient(135deg, var(--grad1), var(--grad2)); border: 1px solid var(--accent2); border-radius: 20px; padding: 20px; }
+    .wallet-label { font-size: 13px; color: var(--muted2); margin-bottom: 6px; }
+    .wallet-amount { font-size: 28px; font-weight: 900; color: var(--accent); margin-bottom: 4px; }
+    .wallet-amount span { font-size: 14px; color: var(--muted); }
+    .wallet-note { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+    .wallet-note b { color: var(--warn); }
     .wallet-actions { display: flex; gap: 10px; }
     .wallet-btn { flex: 1; padding: 11px; border-radius: 11px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
-    .wallet-btn-charge { background: #e8956d; color: #1a1210; }
-    .wallet-btn-withdraw { background: transparent; border: 1px solid #e8956d; color: #e8956d; }
+    .wallet-btn-charge { background: var(--accent); color:var(--on-accent); }
+    .wallet-btn-withdraw { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
     .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 16px 20px; }
-    .stat-card { background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 14px; padding: 14px; text-align: center; }
+    .stat-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; text-align: center; }
     .stat-icon { font-size: 22px; margin-bottom: 6px; }
-    .stat-num { font-size: 20px; font-weight: 900; color: #e8956d; }
-    .stat-label { font-size: 11px; color: #8a7060; margin-top: 3px; }
-    .project-card { background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 14px; padding: 14px; margin-bottom: 10px; cursor: pointer; }
+    .stat-num { font-size: 20px; font-weight: 900; color: var(--accent); }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .project-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 10px; cursor: pointer; }
     .project-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .project-title { font-size: 14px; font-weight: 700; color: #f0e6d3; }
-    .project-meta { font-size: 12px; color: #8a7060; margin-bottom: 4px; }
-    .project-price { font-size: 13px; color: #e8956d; font-weight: 700; }
-    .avatar { width: 40px; height: 40px; border-radius: 50%; background: #3d2b20; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-    .avatar-lg { width: 72px; height: 72px; border-radius: 50%; background: #3d2b20; display: flex; align-items: center; justify-content: center; font-size: 34px; border: 3px solid #e8956d; }
-    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #3d2b2033; }
+    .project-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .project-meta { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .project-price { font-size: 13px; color: var(--accent); font-weight: 700; }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--line); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .avatar-lg { width: 72px; height: 72px; border-radius: 50%; background: var(--line); display: flex; align-items: center; justify-content: center; font-size: 34px; border: 3px solid var(--accent); }
+    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 20%, transparent); }
     .info-row:last-child { border-bottom: none; }
-    .info-key { font-size: 13px; color: #8a7060; }
-    .info-val { font-size: 13px; font-weight: 600; color: #f0e6d3; }
-    .info-val.hl { color: #e8956d; }
-    .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 13px 0; border-bottom: 1px solid #3d2b2033; cursor: pointer; }
+    .info-key { font-size: 13px; color: var(--muted); }
+    .info-val { font-size: 13px; font-weight: 600; color: var(--text); }
+    .info-val.hl { color: var(--accent); }
+    .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 13px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 20%, transparent); cursor: pointer; }
     .menu-item:last-child { border-bottom: none; }
     .menu-right { display: flex; align-items: center; gap: 10px; }
     .menu-icon { font-size: 20px; }
-    .menu-label { font-size: 14px; color: #f0e6d3; }
-    .menu-arrow { font-size: 14px; color: #8a7060; }
-    .menu-badge { background: #e86d6d; color: white; font-size: 11px; padding: 2px 8px; border-radius: 20px; }
+    .menu-label { font-size: 14px; color: var(--text); }
+    .menu-arrow { font-size: 14px; color: var(--muted); }
+    .menu-badge { background: var(--err); color: white; font-size: 11px; padding: 2px 8px; border-radius: 20px; }
     .filters { display: flex; gap: 8px; padding: 0 16px 14px; overflow-x: auto; }
-    .filter-btn { padding: 7px 14px; border-radius: 20px; border: 1px solid #3d2b20; background: transparent; color: #8a7060; font-size: 12px; cursor: pointer; white-space: nowrap; font-family: inherit; }
-    .filter-btn.active { background: #e8956d; color: #1a1210; border-color: #e8956d; font-weight: 700; }
+    .filter-btn { padding: 7px 14px; border-radius: 20px; border: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; white-space: nowrap; font-family: inherit; }
+    .filter-btn.active { background: var(--accent); color:var(--on-accent); border-color: var(--accent); font-weight: 700; }
     .search-box { margin: 0 16px 12px; }
-    .search-box input { width: 100%; padding: 11px 16px; background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 12px; color: #f0e6d3; font-size: 14px; outline: none; text-align: right; font-family: inherit; }
-    .search-box input:focus { border-color: #e8956d; }
-    .fab { position: fixed; bottom: 75px; left: 50%; transform: translateX(-50%); background: #e8956d; color: #1a1210; border: none; border-radius: 14px; padding: 13px 28px; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(232,149,109,0.3); white-space: nowrap; z-index: 49; font-family: inherit; }
-    .bottom-bar { position: fixed; bottom: 0; width: 100%; background: #2a1f1a; border-top: 1px solid #3d2b20; padding: 10px 16px; display: flex; gap: 10px; z-index: 50; }
+    .search-box input { width: 100%; padding: 11px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; color: var(--text); font-size: 14px; outline: none; text-align: right; font-family: inherit; }
+    .search-box input:focus { border-color: var(--accent); }
+    .fab { position: fixed; bottom: 75px; left: 50%; transform: translateX(-50%); background: var(--accent); color:var(--on-accent); border: none; border-radius: 14px; padding: 13px 28px; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(232,149,109,0.3); white-space: nowrap; z-index: 49; font-family: inherit; }
+    .bottom-bar { position: fixed; bottom: 0; width: 100%; background: var(--surface); border-top: 1px solid var(--line); padding: 10px 16px; display: flex; gap: 10px; z-index: 50; }
     .bottom-bar .btn { margin-bottom: 0; }
-    .chat-header { background: #2a1f1a; padding: 14px 18px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #3d2b20; position: sticky; top: 0; z-index: 50; }
-    .chat-name { font-size: 14px; font-weight: 700; color: #f0e6d3; }
-    .chat-status { font-size: 11px; color: #7bc67e; }
+    .chat-header { background: var(--surface); padding: 14px 18px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; }
+    .chat-name { font-size: 14px; font-weight: 700; color: var(--text); }
+    .chat-status { font-size: 11px; color: var(--ok); }
     .chat-messages { padding: 12px; padding-bottom: 120px; min-height: calc(100vh - 140px); }
     .message { display: flex; margin-bottom: 10px; gap: 8px; }
     .message.sent { flex-direction: row-reverse; }
     .msg-bubble { max-width: 75%; padding: 9px 13px; border-radius: 16px; font-size: 13px; line-height: 1.6; }
-    .message.received .msg-bubble { background: #2a1f1a; border: 1px solid #3d2b20; color: #f0e6d3; border-bottom-right-radius: 4px; }
-    .message.sent .msg-bubble { background: #e8956d; color: #1a1210; border-bottom-left-radius: 4px; }
+    .message.received .msg-bubble { background: var(--surface); border: 1px solid var(--line); color: var(--text); border-bottom-right-radius: 4px; }
+    .message.sent .msg-bubble { background: var(--accent); color:var(--on-accent); border-bottom-left-radius: 4px; }
     .msg-time { font-size: 10px; margin-top: 4px; opacity: 0.6; }
     .message.sent .msg-time { text-align: right; }
-    .system-msg { text-align: center; font-size: 11px; color: #8a7060; background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 20px; padding: 5px 14px; margin: 8px auto; width: fit-content; }
-    .chat-input-bar { position: fixed; bottom: 0; width: 100%; background: #2a1f1a; border-top: 1px solid #3d2b20; padding: 8px 12px; display: flex; align-items: center; gap: 8px; z-index: 50; }
-    .chat-input { flex: 1; background: #1a1210; border: 1px solid #3d2b20; border-radius: 20px; padding: 9px 14px; color: #f0e6d3; font-size: 14px; outline: none; font-family: inherit; resize: none; }
-    .chat-input:focus { border-color: #e8956d; }
-    .send-btn { width: 40px; height: 40px; border-radius: 50%; background: #e8956d; border: none; color: #1a1210; font-size: 16px; cursor: pointer; flex-shrink: 0; }
-    .warning-msg { background: #4a2010; border: 1px solid #e8956d44; border-radius: 10px; padding: 8px 12px; font-size: 11px; color: #e8b56d; text-align: center; margin: 6px 12px; }
-    .profile-hero { background: linear-gradient(135deg, #3d2010, #2a1505); padding: 24px 16px; text-align: center; border-bottom: 1px solid #3d2b20; }
-    .profile-name { font-size: 18px; font-weight: 700; color: #f0e6d3; margin-bottom: 4px; }
-    .profile-role { font-size: 13px; color: #8a7060; margin-bottom: 12px; }
+    .system-msg { text-align: center; font-size: 11px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 5px 14px; margin: 8px auto; width: fit-content; }
+    .chat-input-bar { position: fixed; bottom: 0; width: 100%; background: var(--surface); border-top: 1px solid var(--line); padding: 8px 12px; display: flex; align-items: center; gap: 8px; z-index: 50; }
+    .chat-input { flex: 1; background: var(--bg); border: 1px solid var(--line); border-radius: 20px; padding: 9px 14px; color: var(--text); font-size: 14px; outline: none; font-family: inherit; resize: none; }
+    .chat-input:focus { border-color: var(--accent); }
+    .send-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); border: none; color:var(--on-accent); font-size: 16px; cursor: pointer; flex-shrink: 0; }
+    .warning-msg { background: var(--warn-bg2); border: 1px solid color-mix(in srgb, var(--accent) 27%, transparent); border-radius: 10px; padding: 8px 12px; font-size: 11px; color: var(--warn); text-align: center; margin: 6px 12px; }
+    .profile-hero { background: linear-gradient(135deg, var(--grad1), var(--grad2)); padding: 24px 16px; text-align: center; border-bottom: 1px solid var(--line); }
+    .profile-name { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .profile-role { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
     .profile-badges { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
     .profile-badge { font-size: 11px; padding: 4px 12px; border-radius: 20px; }
-    .pb-verified { background: #2d4a1e; color: #7bc67e; }
-    .pb-member { background: #1e3a4a; color: #6db8e8; }
-    .pb-top { background: #4a3010; color: #e8b56d; }
-    .profile-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: #3d2b20; border-bottom: 1px solid #3d2b20; }
-    .profile-stat { background: #2a1f1a; padding: 14px 8px; text-align: center; }
-    .profile-stat-val { font-size: 16px; font-weight: 900; color: #e8956d; margin-bottom: 3px; }
-    .profile-stat-label { font-size: 10px; color: #8a7060; }
-    .tx-card { background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 12px; padding: 13px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .pb-verified { background: var(--ok-bg); color: var(--ok); }
+    .pb-member { background: var(--info-bg); color: var(--info); }
+    .pb-top { background: var(--warn-bg); color: var(--warn); }
+    .profile-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--line); border-bottom: 1px solid var(--line); }
+    .profile-stat { background: var(--surface); padding: 14px 8px; text-align: center; }
+    .profile-stat-val { font-size: 16px; font-weight: 900; color: var(--accent); margin-bottom: 3px; }
+    .profile-stat-label { font-size: 10px; color: var(--muted); }
+    .tx-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 13px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     .tx-right { display: flex; align-items: center; gap: 10px; }
     .tx-icon { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-    .tx-icon.charge { background: #2d4a1e; }
-    .tx-icon.payment { background: #4a3010; }
-    .tx-icon.locked { background: #1e3a4a; }
-    .tx-title { font-size: 13px; font-weight: 700; color: #f0e6d3; margin-bottom: 2px; }
-    .tx-date { font-size: 11px; color: #8a7060; }
+    .tx-icon.charge { background: var(--ok-bg); }
+    .tx-icon.payment { background: var(--warn-bg); }
+    .tx-icon.locked { background: var(--info-bg); }
+    .tx-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .tx-date { font-size: 11px; color: var(--muted); }
     .tx-amount { font-size: 14px; font-weight: 700; }
-    .tx-amount.plus { color: #7bc67e; }
-    .tx-amount.minus { color: #e86d6d; }
-    .tx-amount.locked-c { color: #6db8e8; }
-    .delivery-card { background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 14px; padding: 14px; margin-bottom: 10px; }
-    .delivery-link { display: flex; align-items: center; gap: 8px; background: #1a1210; border: 1px solid #3d2b20; border-radius: 10px; padding: 9px 13px; margin: 8px 0; }
-    .delivery-link-text { font-size: 13px; color: #e8956d; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: ltr; text-align: left; }
-    .approved-note { background: #2d4a1e; border-radius: 10px; padding: 8px 12px; font-size: 12px; color: #7bc67e; text-align: center; }
-    .rejected-note { background: #3a1e1e; border-radius: 10px; padding: 8px 12px; font-size: 12px; color: #e86d6d; }
-    .sign-box { background: #2a1f1a; border: 2px dashed #3d2b20; border-radius: 14px; padding: 18px; text-align: center; margin-bottom: 14px; }
+    .tx-amount.plus { color: var(--ok); }
+    .tx-amount.minus { color: var(--err); }
+    .tx-amount.locked-c { color: var(--info); }
+    .delivery-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+    .delivery-link { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 9px 13px; margin: 8px 0; }
+    .delivery-link-text { font-size: 13px; color: var(--accent); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: ltr; text-align: left; }
+    .approved-note { background: var(--ok-bg); border-radius: 10px; padding: 8px 12px; font-size: 12px; color: var(--ok); text-align: center; }
+    .rejected-note { background: var(--err-bg); border-radius: 10px; padding: 8px 12px; font-size: 12px; color: var(--err); }
+    .sign-box { background: var(--surface); border: 2px dashed var(--line); border-radius: 14px; padding: 18px; text-align: center; margin-bottom: 14px; }
     .sign-checkbox { display: flex; align-items: center; gap: 10px; cursor: pointer; margin-bottom: 8px; text-align: right; }
-    .sign-checkbox input { width: 18px; height: 18px; accent-color: #e8956d; flex-shrink: 0; }
-    .sign-checkbox span { font-size: 12px; color: #a08060; line-height: 1.5; }
+    .sign-checkbox input { width: 18px; height: 18px; accent-color: var(--accent); flex-shrink: 0; }
+    .sign-checkbox span { font-size: 12px; color: var(--muted2); line-height: 1.5; }
     .parties { display: flex; gap: 12px; }
-    .party-card { flex: 1; background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 12px; padding: 12px; text-align: center; }
+    .party-card { flex: 1; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; text-align: center; }
     .party-avatar { font-size: 26px; margin-bottom: 5px; }
-    .party-role-label { font-size: 11px; color: #8a7060; margin-bottom: 3px; }
-    .party-name { font-size: 13px; font-weight: 700; color: #f0e6d3; }
-    .party-signed { font-size: 11px; color: #7bc67e; margin-top: 5px; }
-    .party-waiting { font-size: 11px; color: #e8b56d; margin-top: 5px; }
-    .clause { background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 12px; padding: 13px; margin-bottom: 10px; }
-    .clause-num { font-size: 11px; color: #e8956d; margin-bottom: 5px; font-weight: 700; }
-    .clause-text { font-size: 13px; color: #a08060; line-height: 1.7; }
+    .party-role-label { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+    .party-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .party-signed { font-size: 11px; color: var(--ok); margin-top: 5px; }
+    .party-waiting { font-size: 11px; color: var(--warn); margin-top: 5px; }
+    .clause { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 13px; margin-bottom: 10px; }
+    .clause-num { font-size: 11px; color: var(--accent); margin-bottom: 5px; font-weight: 700; }
+    .clause-text { font-size: 13px; color: var(--muted2); line-height: 1.7; }
     .modal-overlay { display: none; position: fixed; inset: 0; background: #000000aa; z-index: 200; }
     .modal-overlay.show { display: flex; align-items: flex-end; }
-    .modal { background: #2a1f1a; border-radius: 20px 20px 0 0; padding: 22px; width: 100%; border-top: 1px solid #3d2b20; }
-    .modal-title { font-size: 16px; font-weight: 700; color: #f0e6d3; margin-bottom: 18px; text-align: center; }
+    .modal { background: var(--surface); border-radius: 20px 20px 0 0; padding: 22px; width: 100%; border-top: 1px solid var(--line); }
+    .modal-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 18px; text-align: center; }
     .amount-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-    .amount-btn { padding: 11px; background: #1a1210; border: 1px solid #3d2b20; border-radius: 10px; color: #f0e6d3; font-size: 12px; cursor: pointer; text-align: center; font-family: inherit; }
-    .amount-btn.active { border-color: #e8956d; color: #e8956d; }
+    .amount-btn { padding: 11px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; color: var(--text); font-size: 12px; cursor: pointer; text-align: center; font-family: inherit; }
+    .amount-btn.active { border-color: var(--accent); color: var(--accent); }
     .skills { display: flex; flex-wrap: wrap; gap: 6px; }
     .skill-tag { padding: 5px 12px; border-radius: 20px; font-size: 12px; }
-    .skill-real { border: 1px solid #e8956d33; background: #e8956d11; color: #e8956d; }
-    .skill-select { border: 1px solid #3d2b20; background: transparent; color: #8a7060; cursor: pointer; }
-    .skill-select.active { border-color: #e8956d; background: #e8956d11; color: #e8956d; }
+    .skill-real { border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); background: color-mix(in srgb, var(--accent) 7%, transparent); color: var(--accent); }
+    .skill-select { border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; }
+    .skill-select.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 7%, transparent); color: var(--accent); }
     .steps { display: flex; gap: 8px; padding: 16px 20px; }
-    .step { flex: 1; height: 4px; border-radius: 2px; background: #3d2b20; }
-    .step.active { background: #e8956d; }
-    .step-label { text-align: center; font-size: 12px; color: #8a7060; margin-bottom: 16px; }
+    .step { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
+    .step.active { background: var(--accent); }
+    .step-label { text-align: center; font-size: 12px; color: var(--muted); margin-bottom: 16px; }
     .subpage { display: none; padding: 0 16px; }
     .subpage.active { display: block; }
     .type-select { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
-    .type-btn { padding: 13px; background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 12px; color: #8a7060; font-size: 13px; cursor: pointer; text-align: center; font-family: inherit; }
+    .type-btn { padding: 13px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; color: var(--muted); font-size: 13px; cursor: pointer; text-align: center; font-family: inherit; }
     .type-btn .ticon { font-size: 22px; display: block; margin-bottom: 5px; }
-    .type-btn.active { border-color: #e8956d; color: #e8956d; }
-    .date-divider { text-align: center; font-size: 11px; color: #4a3828; margin: 10px 0; }
+    .type-btn.active { border-color: var(--accent); color: var(--accent); }
+    .date-divider { text-align: center; font-size: 11px; color: var(--faint); margin: 10px 0; }
     .filter-tabs { display: flex; gap: 6px; }
-    .filter-tab { padding: 5px 11px; border-radius: 20px; border: 1px solid #3d2b20; background: transparent; color: #8a7060; font-size: 12px; cursor: pointer; font-family: inherit; }
-    .filter-tab.active { background: #e8956d; color: #1a1210; border-color: #e8956d; font-weight: 700; }
-    .request-card { background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+    .filter-tab { padding: 5px 11px; border-radius: 20px; border: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; font-family: inherit; }
+    .filter-tab.active { background: var(--accent); color:var(--on-accent); border-color: var(--accent); font-weight: 700; }
+    .request-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
     .req-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .req-price { font-size: 14px; color: #e8956d; font-weight: 700; }
-    .req-msg { font-size: 13px; color: #8a7060; line-height: 1.6; margin-bottom: 10px; }
+    .req-price { font-size: 14px; color: var(--accent); font-weight: 700; }
+    .req-msg { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
     .req-actions { display: flex; gap: 8px; }
-    .btn-accept { flex: 1; padding: 9px; background: #e8956d; color: #1a1210; border: none; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
-    .btn-reject-sm { padding: 9px 13px; background: transparent; color: #e86d6d; border: 1px solid #e86d6d44; border-radius: 10px; font-size: 12px; cursor: pointer; font-family: inherit; }
-    .btn-profile-sm { padding: 9px 13px; background: transparent; color: #8a7060; border: 1px solid #3d2b20; border-radius: 10px; font-size: 12px; cursor: pointer; font-family: inherit; }
-    .available-card { background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 14px; padding: 14px; margin-bottom: 10px; }
-    .info-tag { font-size: 11px; color: #8a7060; background: #1a1210; border: 1px solid #3d2b20; border-radius: 20px; padding: 3px 9px; display: inline-block; }
-    .project-banner { margin: 14px; background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 13px; padding: 13px 15px; }
-    .banner-label { font-size: 12px; color: #8a7060; margin-bottom: 3px; }
-    .banner-title { font-size: 14px; font-weight: 700; color: #f0e6d3; margin-bottom: 7px; }
+    .btn-accept { flex: 1; padding: 9px; background: var(--accent); color:var(--on-accent); border: none; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .btn-reject-sm { padding: 9px 13px; background: transparent; color: var(--err); border: 1px solid color-mix(in srgb, var(--err) 27%, transparent); border-radius: 10px; font-size: 12px; cursor: pointer; font-family: inherit; }
+    .btn-profile-sm { padding: 9px 13px; background: transparent; color: var(--muted); border: 1px solid var(--line); border-radius: 10px; font-size: 12px; cursor: pointer; font-family: inherit; }
+    .available-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+    .info-tag { font-size: 11px; color: var(--muted); background: var(--bg); border: 1px solid var(--line); border-radius: 20px; padding: 3px 9px; display: inline-block; }
+    .project-banner { margin: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 13px; padding: 13px 15px; }
+    .banner-label { font-size: 12px; color: var(--muted); margin-bottom: 3px; }
+    .banner-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 7px; }
     .banner-row { display: flex; justify-content: space-between; }
-    .banner-info { font-size: 12px; color: #8a7060; }
-    .banner-info b { color: #e8956d; }
-    .escrow-box { background: linear-gradient(135deg, #3d2010, #2a1505); border: 1px solid #c4703f; border-radius: 14px; padding: 15px; text-align: center; margin: 0 16px 14px; }
-    .escrow-label { font-size: 12px; color: #a08060; margin-bottom: 5px; }
-    .escrow-amount { font-size: 20px; font-weight: 900; color: #e8956d; margin-bottom: 4px; }
-    .escrow-note { font-size: 11px; color: #8a7060; margin-bottom: 12px; }
-    .new-delivery { background: #2a1f1a; border: 2px dashed #e8956d44; border-radius: 14px; padding: 18px; margin-bottom: 14px; }
-    .new-delivery-title { font-size: 14px; font-weight: 700; color: #e8956d; margin-bottom: 14px; text-align: center; }
+    .banner-info { font-size: 12px; color: var(--muted); }
+    .banner-info b { color: var(--accent); }
+    .escrow-box { background: linear-gradient(135deg, var(--grad1), var(--grad2)); border: 1px solid var(--accent2); border-radius: 14px; padding: 15px; text-align: center; margin: 0 16px 14px; }
+    .escrow-label { font-size: 12px; color: var(--muted2); margin-bottom: 5px; }
+    .escrow-amount { font-size: 20px; font-weight: 900; color: var(--accent); margin-bottom: 4px; }
+    .escrow-note { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+    .new-delivery { background: var(--surface); border: 2px dashed color-mix(in srgb, var(--accent) 27%, transparent); border-radius: 14px; padding: 18px; margin-bottom: 14px; }
+    .new-delivery-title { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 14px; text-align: center; }
 
     /* ===== لاگین ===== */
-    .tabs { display: flex; width: 100%; max-width: 360px; background: #2a1f1a; border-radius: 13px; padding: 4px; margin-bottom: 22px; }
-    .tab { flex: 1; padding: 9px; text-align: center; border-radius: 9px; font-size: 14px; cursor: pointer; color: #8a7060; border: none; background: transparent; font-family: inherit; }
-    .tab.active { background: #e8956d; color: #1a1210; font-weight: 700; }
+    .tabs { display: flex; width: 100%; max-width: 360px; background: var(--surface); border-radius: 13px; padding: 4px; margin-bottom: 22px; }
+    .tab { flex: 1; padding: 9px; text-align: center; border-radius: 9px; font-size: 14px; cursor: pointer; color: var(--muted); border: none; background: transparent; font-family: inherit; }
+    .tab.active { background: var(--accent); color:var(--on-accent); font-weight: 700; }
     .role-select { display: flex; gap: 12px; margin-bottom: 22px; width: 100%; max-width: 360px; }
-    .role-btn { flex: 1; padding: 13px; background: #2a1f1a; border: 2px solid #3d2b20; border-radius: 12px; color: #8a7060; font-size: 13px; cursor: pointer; text-align: center; font-family: inherit; }
-    .role-btn.active { border-color: #e8956d; color: #e8956d; background: #e8956d11; }
+    .role-btn { flex: 1; padding: 13px; background: var(--surface); border: 2px solid var(--line); border-radius: 12px; color: var(--muted); font-size: 13px; cursor: pointer; text-align: center; font-family: inherit; }
+    .role-btn.active { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 7%, transparent); }
     .role-btn .ricon { font-size: 22px; display: block; margin-bottom: 5px; }
 
     /* ===== OTP ===== */
     .otp-container { display: flex; gap: 10px; justify-content: center; margin-bottom: 28px; direction: ltr; }
-    .otp-input { width: 50px; height: 58px; background: #2a1f1a; border: 1px solid #3d2b20; border-radius: 12px; color: #f0e6d3; font-size: 22px; font-weight: 700; text-align: center; outline: none; }
-    .otp-input:focus { border-color: #e8956d; }
+    .otp-input { width: 50px; height: 58px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; color: var(--text); font-size: 22px; font-weight: 700; text-align: center; outline: none; }
+    .otp-input:focus { border-color: var(--accent); }
     .enamad-badge img { width: 48px; height: 48px; cursor: pointer; }
+
+    /* ===== تم‌ها: همه‌ی رنگ‌های سایت از این متغیرها خونده می‌شن ===== */
+    :root, [data-theme="dark"] {
+      --bg:#1a1210; --surface:#2a1f1a; --surface-solid:#2a1f1a; --line:#3d2b20;
+      --text:#f0e6d3; --muted:#8a7060; --muted2:#a08060; --faint:#4a3828;
+      --accent:#e8956d; --accent2:#c4703f; --on-accent:#1a1210;
+      --ok:#7bc67e; --ok-bg:#2d4a1e; --ok-bg2:#1e3a1e;
+      --err:#e86d6d; --err-bg:#3a1e1e;
+      --warn:#e8b56d; --warn-bg:#4a3010; --warn-bg2:#4a2010;
+      --info:#6db8e8; --info-bg:#1e3a4a; --info2:#6d8de8; --info2-bg:#1e2a4a;
+      --grad1:#3d2010; --grad2:#2a1505;
+      --shadow:none; --page-bg:var(--bg); --radius-card:16px; --radius-btn:14px;
+    }
+    [data-theme="light"] {
+      --bg:#f6f3ee; --surface:#ffffff; --surface-solid:#ffffff; --line:#e4ddd2;
+      --text:#2b2420; --muted:#7a6e63; --muted2:#6b5f54; --faint:#a79b8e;
+      --accent:#d9622b; --accent2:#b24c1c; --on-accent:#ffffff;
+      --ok:#1f7a2e; --ok-bg:#dcf3df; --ok-bg2:#e4f6e6;
+      --err:#c0392b; --err-bg:#fbe3e0;
+      --warn:#9a6200; --warn-bg:#fdeccb; --warn-bg2:#fdeccb;
+      --info:#1c6fa8; --info-bg:#dcecf7; --info2:#3a56c4; --info2-bg:#e2e8fb;
+      --grad1:#ffe8d6; --grad2:#ffd2b5;
+      --shadow:0 1px 3px rgba(60,40,20,.08); --page-bg:var(--bg);
+    }
+    [data-theme="clay"] {
+      --bg:#e9e6f5; --surface:#f3f1fb; --surface-solid:#f3f1fb; --line:#d8d3ee;
+      --text:#3a3560; --muted:#7f7aa6; --muted2:#6e69a0; --faint:#aaa5cc;
+      --accent:#7c6cf0; --accent2:#5f4fd6; --on-accent:#ffffff;
+      --ok:#2f9e5b; --ok-bg:#d8f2e3; --ok-bg2:#e0f5e9;
+      --err:#d6455d; --err-bg:#fbdfe5;
+      --warn:#b97a0a; --warn-bg:#fbebcb; --warn-bg2:#fbebcb;
+      --info:#3b82c4; --info-bg:#dbe9f7; --info2:#6a5ae0; --info2-bg:#e3defa;
+      --grad1:#cfc7fa; --grad2:#b9b0f3;
+      --shadow:8px 8px 18px rgba(150,142,196,.45), -6px -6px 14px rgba(255,255,255,.85);
+      --page-bg:var(--bg); --radius-card:24px; --radius-btn:20px;
+    }
+    [data-theme="glass"] {
+      --bg:#140f2b; --surface:rgba(255,255,255,.08); --surface-solid:#241c4a; --line:rgba(255,255,255,.16);
+      --text:#f2f0ff; --muted:#a9a3cf; --muted2:#b9b3dd; --faint:#7e78a8;
+      --accent:#7dd3fc; --accent2:#38bdf8; --on-accent:#0b1020;
+      --ok:#6ee7a0; --ok-bg:rgba(110,231,160,.18); --ok-bg2:rgba(110,231,160,.14);
+      --err:#ff8a9b; --err-bg:rgba(255,138,155,.18);
+      --warn:#ffd479; --warn-bg:rgba(255,212,121,.18); --warn-bg2:rgba(255,212,121,.14);
+      --info:#7dd3fc; --info-bg:rgba(125,211,252,.18); --info2:#a5b4fc; --info2-bg:rgba(165,180,252,.18);
+      --grad1:rgba(125,211,252,.24); --grad2:rgba(157,140,255,.2);
+      --shadow:0 8px 32px rgba(0,0,0,.28);
+      --page-bg:linear-gradient(135deg,#1b1038 0%,#0f2a4a 55%,#12243a 100%); --radius-card:20px;
+    }
+    [data-theme="cyber"] {
+      --bg:#0a0a14; --surface:#12122a; --surface-solid:#12122a; --line:#2a2a5a;
+      --text:#e6f1ff; --muted:#7f8fbf; --muted2:#9aa8d8; --faint:#4a5388;
+      --accent:#ff2bd6; --accent2:#00e5ff; --on-accent:#0a0a14;
+      --ok:#39ff88; --ok-bg:#0d3320; --ok-bg2:#0d3320;
+      --err:#ff4d6d; --err-bg:#3a0f1c;
+      --warn:#ffd23f; --warn-bg:#3a3010; --warn-bg2:#3a3010;
+      --info:#00e5ff; --info-bg:#08303a; --info2:#9b7bff; --info2-bg:#1f1844;
+      --grad1:#2a0f3d; --grad2:#0f1f3d;
+      --shadow:0 0 0 1px rgba(255,43,214,.22), 0 0 18px rgba(255,43,214,.12);
+      --page-bg:var(--bg); --radius-card:12px; --radius-btn:10px;
+    }
+    body { background: var(--page-bg); background-attachment: fixed; }
+    .card, .project-card, .stat-card, .available-card, .request-card, .delivery-card, .tx-card,
+    .clause, .party-card, .escrow-box, .wallet-card, .sign-box, .profile-stat { box-shadow: var(--shadow); }
+    .card, .project-card, .stat-card, .available-card, .request-card, .delivery-card, .tx-card,
+    .clause, .party-card, .escrow-box, .wallet-card, .sign-box { border-radius: var(--radius-card); }
+    .btn, .wallet-btn, .fab { border-radius: var(--radius-btn); }
+    .modal { background: var(--surface-solid); }
+    .input-group select option { background: var(--surface-solid); }
+    [data-theme="glass"] .header, [data-theme="glass"] .navbar, [data-theme="glass"] .bottom-bar,
+    [data-theme="glass"] .chat-input-bar, [data-theme="glass"] .chat-header,
+    [data-theme="glass"] .card, [data-theme="glass"] .project-card, [data-theme="glass"] .stat-card,
+    [data-theme="glass"] .available-card, [data-theme="glass"] .request-card, [data-theme="glass"] .delivery-card,
+    [data-theme="glass"] .tx-card, [data-theme="glass"] .clause, [data-theme="glass"] .party-card,
+    [data-theme="glass"] .wallet-card, [data-theme="glass"] .modal {
+      -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    }
+    [data-theme="clay"] .header, [data-theme="clay"] .navbar, [data-theme="clay"] .bottom-bar,
+    [data-theme="clay"] .chat-input-bar { box-shadow: 0 -4px 16px rgba(150,142,196,.25); }
+    [data-theme="clay"] .btn-primary, [data-theme="clay"] .wallet-btn-charge, [data-theme="clay"] .fab {
+      box-shadow: 4px 4px 10px color-mix(in srgb, var(--accent) 40%, transparent), -3px -3px 8px rgba(255,255,255,.8);
+    }
+    [data-theme="cyber"] .logo, [data-theme="cyber"] .section-title { text-shadow: 0 0 10px color-mix(in srgb, var(--accent) 55%, transparent); }
+    [data-theme="cyber"] .btn-primary, [data-theme="cyber"] .fab { box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 55%, transparent); }
+    .theme-opt { display:flex; align-items:center; gap:12px; padding:12px; border:2px solid var(--line); border-radius:14px; margin-bottom:10px; cursor:pointer; background:var(--bg); color:var(--text); }
+    .theme-opt.active { border-color: var(--accent); }
+    .theme-sw { display:flex; flex-shrink:0; }
+    .theme-sw span { width:18px; height:34px; display:block; border:1px solid rgba(128,128,128,.35); }
+    .theme-sw span:first-child { border-radius:0 8px 8px 0; }
+    .theme-sw span:last-child { border-radius:8px 0 0 8px; }
+    .theme-name { font-size:14px; font-weight:700; }
+    .theme-desc { font-size:11px; color:var(--muted); margin-top:2px; }
   </style>
   </head>
 <body>
@@ -222,23 +327,24 @@
 <div class="page active" id="page-landing">
   <div class="page-center">
     <div class="logo" style="font-size:38px;margin-bottom:8px">gram<span>work</span></div>
-    <div style="font-size:14px;color:#8a7060;margin-bottom:36px;text-align:center">ادمین مناسب، کارفرمای مناسب</div>
+    <div style="font-size:14px;color:var(--muted);margin-bottom:36px;text-align:center">ادمین مناسب، کارفرمای مناسب</div>
 
     <div class="card" style="max-width:360px;width:100%;cursor:pointer" onclick="showPublicExplore('employer')">
-      <div style="font-size:17px;color:#e8956d;font-weight:700;margin-bottom:6px">👨‍💼 کارفرما هستم</div>
-      <div style="font-size:13px;color:#8a7060;line-height:1.5">نیرو متخصص برای پیج و کانالم پیدا می‌کنم</div>
+      <div style="font-size:17px;color:var(--accent);font-weight:700;margin-bottom:6px">👨‍💼 کارفرما هستم</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.5">نیرو متخصص برای پیج و کانالم پیدا می‌کنم</div>
     </div>
 
     <div class="card" style="max-width:360px;width:100%;cursor:pointer" onclick="showPublicExplore('admin')">
-      <div style="font-size:17px;color:#e8956d;font-weight:700;margin-bottom:6px">👨‍💻 ادمین هستم</div>
-      <div style="font-size:13px;color:#8a7060;line-height:1.5">پروژه می‌گیرم و درآمد کسب می‌کنم</div>
+      <div style="font-size:17px;color:var(--accent);font-weight:700;margin-bottom:6px">👨‍💻 ادمین هستم</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.5">پروژه می‌گیرم و درآمد کسب می‌کنم</div>
     </div>
 
     <button class="btn btn-primary" onclick="goLogin()">ورود / ثبت‌نام</button>
-    <div style="font-size:12px;color:#4a3828;margin-top:16px;text-align:center">گرام ورک — بازار کار دیجیتال ایران</div>
-    <a href="/contact.html" style="font-size:12px;color:#e8956d;margin-top:10px;text-align:center;text-decoration:none">ارتباط با ما</a>
+    <div style="font-size:12px;color:var(--faint);margin-top:16px;text-align:center">گرام ورک — بازار کار دیجیتال ایران</div>
+    <a href="/contact.html" style="font-size:12px;color:var(--accent);margin-top:10px;text-align:center;text-decoration:none">ارتباط با ما</a>
+    <div style="font-size:12px;color:var(--accent);margin-top:10px;text-align:center;cursor:pointer" onclick="showThemeModal()">🎨 تغییر تم</div>
     <div class="enamad-badge" style="margin-top:16px;text-align:center">
-      <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a>
+      <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='نماد اعتماد الکترونیکی' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a>
     </div>
   </div>
 </div>
@@ -248,13 +354,13 @@
   <div class="header">
     <div class="back-btn" onclick="showPage('landing')">&#8592;</div>
     <div class="header-title" id="explore-title">کاوش</div>
-    <div style="font-size:13px;color:#e8956d;cursor:pointer" onclick="goLogin()">ورود / ثبت‌نام</div>
+    <div style="font-size:13px;color:var(--accent);cursor:pointer" onclick="goLogin()">ورود / ثبت‌نام</div>
   </div>
   <div class="page-content">
     <div style="padding:16px 16px 0">
-      <div style="font-size:13px;color:#8a7060;line-height:1.7;margin-bottom:14px" id="explore-subtitle"></div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px" id="explore-subtitle"></div>
     </div>
-    <div class="section" id="explore-list"><div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">در حال بارگذاری...</div></div>
+    <div class="section" id="explore-list"><div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">در حال بارگذاری...</div></div>
   </div>
   <div class="bottom-bar">
     <button class="btn btn-primary" style="margin:0" id="explore-cta" onclick="exploreCtaAction()">ثبت‌نام کن</button>
@@ -284,8 +390,8 @@
         <input type="password" id="login-password" placeholder="رمز عبورت" onkeydown="if(event.key==='Enter')loginWithPassword()" />
       </div>
       <button class="btn btn-primary" onclick="loginWithPassword()">ورود</button>
-      <div style="text-align:center;font-size:13px;color:#8a7060;margin-top:-6px">
-        رمز نداری یا فراموش کردی؟ <span style="color:#e8956d;cursor:pointer" onclick="sendOtp('access')">با کد تأیید وارد شو</span>
+      <div style="text-align:center;font-size:13px;color:var(--muted);margin-top:-6px">
+        رمز نداری یا فراموش کردی؟ <span style="color:var(--accent);cursor:pointer" onclick="sendOtp('access')">با کد تأیید وارد شو</span>
       </div>
     </div>
 
@@ -306,7 +412,7 @@
         <label>تکرار رمز عبور</label>
         <input type="password" id="register-password2" placeholder="رمز رو دوباره وارد کن" />
       </div>
-      <label style="font-size:13px;color:#a08060;margin-bottom:10px;display:block">نقش من:</label>
+      <label style="font-size:13px;color:var(--muted2);margin-bottom:10px;display:block">نقش من:</label>
       <div class="role-select">
         <div class="role-btn active" id="role-employer" onclick="selectRole('employer')">
           <span class="ricon">👨‍💼</span>کارفرما
@@ -318,7 +424,7 @@
       <button class="btn btn-primary" onclick="sendOtp('register')">دریافت کد تأیید</button>
     </div>
     <div class="enamad-badge" style="margin-top:24px;text-align:center">
-      <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a>
+      <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='نماد اعتماد الکترونیکی' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a>
     </div>
   </div>
 </div>
@@ -327,9 +433,9 @@
 <div class="page" id="page-otp">
   <div class="page-center">
     <div class="logo" style="font-size:26px;margin-bottom:24px">gram<span>work</span></div>
-    <div style="font-size:19px;font-weight:700;color:#f0e6d3;margin-bottom:8px;text-align:center">کد تأیید را وارد کنید</div>
-    <div style="font-size:13px;color:#8a7060;text-align:center;margin-bottom:8px">کد ۵ رقمی به شماره زیر ارسال شد</div>
-    <div style="font-size:15px;color:#e8956d;text-align:center;margin-bottom:28px;direction:ltr" id="otp-phone">09xxxxxxxxx</div>
+    <div style="font-size:19px;font-weight:700;color:var(--text);margin-bottom:8px;text-align:center">کد تأیید را وارد کنید</div>
+    <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:8px">کد ۵ رقمی به شماره زیر ارسال شد</div>
+    <div style="font-size:15px;color:var(--accent);text-align:center;margin-bottom:28px;direction:ltr" id="otp-phone">09xxxxxxxxx</div>
 
 
     <div class="error-box" id="otp-error"></div>
@@ -344,11 +450,11 @@
     </div>
 
     <button class="btn btn-primary" id="otp-verify-btn" style="max-width:360px" onclick="verifyOtp()">تأیید</button>
-    <div style="text-align:center;font-size:13px;color:#8a7060">کد دریافت نکردید؟ <span style="color:#e8956d;cursor:pointer" onclick="goLogin()">ارسال مجدد</span></div>
-    <div style="color:#c4703f;font-size:13px;text-align:center;margin-bottom:8px" id="otp-timer"></div>
+    <div style="text-align:center;font-size:13px;color:var(--muted)">کد دریافت نکردید؟ <span style="color:var(--accent);cursor:pointer" onclick="goLogin()">ارسال مجدد</span></div>
+    <div style="color:var(--accent2);font-size:13px;text-align:center;margin-bottom:8px" id="otp-timer"></div>
 
     <div id="otp-newpass-box" style="display:none;width:100%;max-width:360px">
-      <div style="font-size:13px;color:#7bc67e;text-align:center;margin-bottom:14px">✅ شماره تأیید شد — یه رمز عبور برای ورودهای بعدی انتخاب کن</div>
+      <div style="font-size:13px;color:var(--ok);text-align:center;margin-bottom:14px">✅ شماره تأیید شد — یه رمز عبور برای ورودهای بعدی انتخاب کن</div>
       <div class="input-group">
         <label>رمز عبور جدید</label>
         <input type="password" id="otp-newpass" placeholder="حداقل ۶ کاراکتر" />
@@ -360,7 +466,7 @@
       <button class="btn btn-primary" onclick="submitNewPasswordAfterOtp()">ثبت رمز و ورود</button>
     </div>
     <div class="enamad-badge" style="margin-top:16px;text-align:center">
-      <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a>
+      <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='نماد اعتماد الکترونیکی' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a>
     </div>
   </div>
 </div>
@@ -368,11 +474,11 @@
 <div class="page" id="page-dashboard">
   <div class="header">
     <div>
-      <div style="font-size:13px;color:#8a7060">خوش اومدی 👋</div>
-      <div style="font-size:17px;font-weight:700;color:#f0e6d3" id="dash-username">کاربر</div>
+      <div style="font-size:13px;color:var(--muted)">خوش اومدی 👋</div>
+      <div style="font-size:17px;font-weight:700;color:var(--text)" id="dash-username">کاربر</div>
     </div>
     <div style="display:flex;align-items:center;gap:10px">
-      <div class="enamad-badge"><a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a></div>
+      <div class="enamad-badge"><a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='نماد اعتماد الکترونیکی' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a></div>
       <div class="logo" style="font-size:20px">gram<span>work</span></div>
     </div>
   </div>
@@ -397,7 +503,7 @@
         <div class="section-title">پروژه‌های اخیر</div>
         <div class="see-all" onclick="showPage('projects')">مشاهده همه</div>
       </div>
-      <div id="dash-projects-list"><div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز پروژه‌ای ندارید</div></div>
+      <div id="dash-projects-list"><div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز پروژه‌ای ندارید</div></div>
     </div>
   </div>
   <button class="fab" onclick="showPage('new-project')">+ پروژه جدید</button>
@@ -508,11 +614,11 @@
     <div id="detail-badge" class="badge badge-pending">در انتظار</div>
   </div>
   <div class="page-content">
-    <div style="padding:16px;border-bottom:1px solid #3d2b20">
-      <div style="font-size:18px;font-weight:700;color:#f0e6d3;margin-bottom:8px" id="detail-title"></div>
-      <div style="font-size:13px;color:#a08060;line-height:1.7" id="detail-desc"></div>
+    <div style="padding:16px;border-bottom:1px solid var(--line)">
+      <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px" id="detail-title"></div>
+      <div style="font-size:13px;color:var(--muted2);line-height:1.7" id="detail-desc"></div>
     </div>
-    <div style="padding:16px;border-bottom:1px solid #3d2b20">
+    <div style="padding:16px;border-bottom:1px solid var(--line)">
       <div class="stats-grid" style="margin:0">
         <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-num" style="font-size:14px" id="detail-budget">-</div><div class="stat-label">بودجه</div></div>
         <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-num" style="font-size:14px" id="detail-type">-</div><div class="stat-label">نوع</div></div>
@@ -522,7 +628,7 @@
     </div>
     <div style="padding:16px">
       <div class="section-title" style="margin-bottom:12px">درخواست‌های دریافتی</div>
-      <div id="requests-list"><div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز درخواستی نیست</div></div>
+      <div id="requests-list"><div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز درخواستی نیست</div></div>
     </div>
   </div>
   <div class="bottom-bar">
@@ -541,23 +647,23 @@
     <div style="width:24px"></div>
   </div>
   <div class="page-content">
-    <div style="background:#4a3010;padding:10px 16px;text-align:center;font-size:13px;color:#e8b56d">⏳ در انتظار امضای ادمین</div>
-    <div style="padding:16px;border-bottom:1px solid #3d2b20">
-      <div style="font-size:13px;color:#8a7060;margin-bottom:12px">طرفین قرارداد</div>
+    <div style="background:var(--warn-bg);padding:10px 16px;text-align:center;font-size:13px;color:var(--warn)">⏳ در انتظار امضای ادمین</div>
+    <div style="padding:16px;border-bottom:1px solid var(--line)">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:12px">طرفین قرارداد</div>
       <div class="parties">
         <div class="party-card"><div class="party-avatar">👨‍💼</div><div class="party-role-label">کارفرما</div><div class="party-name" id="contract-employer">-</div><div class="party-signed">✅ امضا شده</div></div>
         <div class="party-card"><div class="party-avatar">👨‍💻</div><div class="party-role-label">ادمین</div><div class="party-name" id="contract-admin">-</div><div class="party-waiting">⏳ در انتظار</div></div>
       </div>
     </div>
-    <div style="padding:16px;border-bottom:1px solid #3d2b20">
-      <div style="font-size:13px;color:#8a7060;margin-bottom:10px">اطلاعات قرارداد</div>
+    <div style="padding:16px;border-bottom:1px solid var(--line)">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px">اطلاعات قرارداد</div>
       <div class="info-row"><div class="info-key">عنوان</div><div class="info-val" id="contract-title">-</div></div>
       <div class="info-row"><div class="info-key">نوع</div><div class="info-val" id="contract-type">-</div></div>
       <div class="info-row"><div class="info-key">مبلغ</div><div class="info-val hl" id="contract-amount">-</div></div>
       <div class="info-row"><div class="info-key">کمیسیون</div><div class="info-val">۱۰٪</div></div>
     </div>
-    <div style="padding:16px;border-bottom:1px solid #3d2b20">
-      <div style="font-size:13px;color:#8a7060;margin-bottom:10px">بندهای قرارداد</div>
+    <div style="padding:16px;border-bottom:1px solid var(--line)">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px">بندهای قرارداد</div>
       <div class="clause"><div class="clause-num">بند ۱ — تعهدات ادمین</div><div class="clause-text">ادمین موظف است کار را طبق قرارداد و با کیفیت مشخص تحویل دهد.</div></div>
       <div class="clause"><div class="clause-num">بند ۲ — تعهدات کارفرما</div><div class="clause-text">کارفرما موظف است مبلغ را حداکثر ۳ روز پس از تحویل تایید کند.</div></div>
       <div class="clause"><div class="clause-num">بند ۳ — فسخ قرارداد</div><div class="clause-text">هر طرف می‌تواند با اطلاع ۱۵ روزه قرارداد را فسخ کند.</div></div>
@@ -566,7 +672,7 @@
     <div style="padding:16px">
       <div class="sign-box">
         <div style="font-size:34px;margin-bottom:8px">✍️</div>
-        <div style="font-size:13px;color:#8a7060;margin-bottom:12px">با امضای این قرارداد تمام بندها را می‌پذیری</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:12px">با امضای این قرارداد تمام بندها را می‌پذیری</div>
         <label class="sign-checkbox"><input type="checkbox" id="agree1" onchange="checkSign()" /><span>تمام بندهای قرارداد را خواندم و می‌پذیرم</span></label>
         <label class="sign-checkbox"><input type="checkbox" id="agree2" onchange="checkSign()" /><span>مبلغ اول از کیف پولم کسر و قفل شود</span></label>
       </div>
@@ -586,7 +692,7 @@
     <div class="logo" style="font-size:18px">gram<span>work</span></div>
   </div>
   <div class="page-content">
-    <div class="section" id="chat-list-items"><div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">در حال بارگذاری...</div></div>
+    <div class="section" id="chat-list-items"><div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">در حال بارگذاری...</div></div>
   </div>
   <div class="navbar">
     <div class="nav-item" onclick="showPage('dashboard')"><div class="nav-icon">🏠</div>خانه</div>
@@ -604,11 +710,11 @@
       <div class="chat-name" id="chat-admin-name">ادمین</div>
       <div class="chat-status">● آنلاین</div>
     </div>
-    <div style="font-size:20px;cursor:pointer;color:#8a7060" onclick="openEmployerDelivery(currentEmployerProjectId)">📋</div>
+    <div style="font-size:20px;cursor:pointer;color:var(--muted)" onclick="openEmployerDelivery(currentEmployerProjectId)">📋</div>
   </div>
-  <div style="background:#2a1f1a;margin:8px 12px;border:1px solid #3d2b20;border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
-    <div><div style="font-size:12px;color:#8a7060">پروژه فعال</div><div style="font-size:13px;font-weight:700;color:#e8956d" id="chat-project-name">-</div></div>
-    <div style="font-size:11px;padding:3px 10px;border-radius:20px;background:#2d4a1e;color:#7bc67e">فعال</div>
+  <div style="background:var(--surface);margin:8px 12px;border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+    <div><div style="font-size:12px;color:var(--muted)">پروژه فعال</div><div style="font-size:13px;font-weight:700;color:var(--accent)" id="chat-project-name">-</div></div>
+    <div style="font-size:11px;padding:3px 10px;border-radius:20px;background:var(--ok-bg);color:var(--ok)">فعال</div>
   </div>
   <div class="warning-msg">⚠️ برای امنیت بیشتر، تمام پرداخت‌ها از طریق گرام‌ورک انجام شود</div>
   <div class="chat-messages" id="chat-messages"></div>
@@ -648,7 +754,7 @@
           <button class="filter-tab" onclick="filterWallet('payment',this)">پرداخت</button>
         </div>
       </div>
-      <div id="wallet-tx-list"><div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز تراکنشی ندارید</div></div>
+      <div id="wallet-tx-list"><div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز تراکنشی ندارید</div></div>
     </div>
   </div>
 </div>
@@ -672,11 +778,11 @@
       <div class="escrow-label">🔒 مبلغ در انتظار تایید</div>
       <div class="escrow-amount" id="delivery-amount">۰ تومان</div>
       <div class="escrow-note">بعد از تایید تحویل، این مبلغ به ادمین پرداخت میشه</div>
-      <button style="width:100%;padding:12px;background:#e8956d;color:#1a1210;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit" onclick="releasePayment()">✅ تایید و آزادسازی پول</button>
+      <button style="width:100%;padding:12px;background:var(--accent);color:var(--on-accent);border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit" onclick="releasePayment()">✅ تایید و آزادسازی پول</button>
     </div>
     <div class="section">
       <div class="section-title" style="margin-bottom:12px">تحویلی‌ها</div>
-      <div id="deliveries-list"><div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز تحویلی ندارید</div></div>
+      <div id="deliveries-list"><div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز تحویلی ندارید</div></div>
     </div>
   </div>
   <div class="bottom-bar">
@@ -688,7 +794,7 @@
 <div class="page" id="page-profile">
   <div class="header">
     <div class="header-title">پروفایل</div>
-    <div style="font-size:22px;cursor:pointer;color:#8a7060">⚙️</div>
+    <div style="font-size:22px;cursor:pointer;color:var(--muted)">⚙️</div>
   </div>
   <div class="page-content">
     <div class="profile-hero">
@@ -719,12 +825,16 @@
         <div class="menu-right"><div class="menu-icon">📄</div><div class="menu-label">قراردادهای من</div></div>
         <div class="menu-arrow">&#8592;</div>
       </div>
+      <div class="menu-item" onclick="showThemeModal()">
+        <div class="menu-right"><div class="menu-icon">🎨</div><div class="menu-label">تم ظاهر سایت</div></div>
+        <div class="menu-arrow">&#8592;</div>
+      </div>
       <div class="menu-item" onclick="showPage('support-chat')">
         <div class="menu-right"><div class="menu-icon">🎧</div><div class="menu-label">پشتیبانی</div></div>
         <div class="menu-arrow">&#8592;</div>
       </div>
     </div>
-    <button onclick="logout()" style="margin:16px;width:calc(100% - 32px);padding:14px;background:transparent;border:1px solid #e86d6d44;color:#e86d6d;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">🚪 خروج</button>
+    <button onclick="logout()" style="margin:16px;width:calc(100% - 32px);padding:14px;background:transparent;border:1px solid color-mix(in srgb, var(--err) 27%, transparent);color:var(--err);border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">🚪 خروج</button>
   </div>
   <div class="navbar">
     <div class="nav-item" onclick="showPage('dashboard')"><div class="nav-icon">🏠</div>خانه</div>
@@ -746,7 +856,7 @@
   </div>
   <div class="chat-messages" id="support-messages"></div>
   <div class="chat-input-bar">
-    <label style="cursor:pointer;font-size:20px;color:#8a7060" for="support-image-input">📎</label>
+    <label style="cursor:pointer;font-size:20px;color:var(--muted)" for="support-image-input">📎</label>
     <input type="file" id="support-image-input" accept="image/*" style="display:none" onchange="sendSupportImage()" />
     <textarea class="chat-input" id="support-input" placeholder="پیام بنویس..." rows="1" onkeydown="handleSupportChatKey(event)"></textarea>
     <button class="send-btn" onclick="sendSupportMsg()">&#10148;</button>
@@ -766,11 +876,11 @@
       <div class="amount-btn" onclick="selectAmount('',this)">دلخواه</div>
     </div>
     <div class="input-group"><input type="number" id="charge-amount" placeholder="مبلغ دلخواه (تومان)" /></div>
-    <div style="background:#1a1210;border:1px solid #3d2b20;border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:2;color:#f0e6d3">
+    <div style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:2;color:var(--text)">
       💳 مبلغ رو به این کارت واریز کن:<br>
-      <b style="color:#e8956d;direction:ltr;display:inline-block">6219-8614-9574-2016</b><br>
+      <b style="color:var(--accent);direction:ltr;display:inline-block">6219-8614-9574-2016</b><br>
       یا شماره شبا:<br>
-      <b style="color:#e8956d;direction:ltr;display:inline-block">IR400560611828016098180101</b><br>
+      <b style="color:var(--accent);direction:ltr;display:inline-block">IR400560611828016098180101</b><br>
       به نام: <b>محمدمهدی آبادیان</b>
     </div>
     <div class="input-group">
@@ -787,11 +897,11 @@
 <div class="page" id="page-admin-dashboard">
   <div class="header">
     <div>
-      <div style="font-size:13px;color:#8a7060">خوش اومدی! 👋</div>
-      <div style="font-size:17px;font-weight:700;color:#f0e6d3" id="admin-dash-username">ادمین</div>
+      <div style="font-size:13px;color:var(--muted)">خوش اومدی! 👋</div>
+      <div style="font-size:17px;font-weight:700;color:var(--text)" id="admin-dash-username">ادمین</div>
     </div>
     <div style="display:flex;align-items:center;gap:10px">
-      <div class="enamad-badge"><a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a></div>
+      <div class="enamad-badge"><a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=773637&Code=5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ' alt='نماد اعتماد الکترونیکی' style='cursor:pointer' code='5oVK49eOJDn3YlQ5op0Xb92vXUOJxxQZ'></a></div>
       <div class="logo" style="font-size:20px">gram<span>work</span></div>
     </div>
   </div>
@@ -813,14 +923,14 @@
         <div class="section-title">پروژه‌های فعال من</div>
         <div class="see-all" onclick="showPage('admin-my-projects')">مشاهده همه</div>
       </div>
-      <div id="admin-active-list"><div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز پروژه فعالی ندارید</div></div>
+      <div id="admin-active-list"><div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز پروژه فعالی ندارید</div></div>
     </div>
     <div class="section">
       <div class="section-header">
         <div class="section-title">پروژه‌های جدید</div>
         <div class="see-all" onclick="showPage('admin-browse')">مشاهده همه</div>
       </div>
-      <div id="admin-new-list"><div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">پروژه‌ای موجود نیست</div></div>
+      <div id="admin-new-list"><div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">پروژه‌ای موجود نیست</div></div>
     </div>
   </div>
   <div class="navbar">
@@ -847,7 +957,7 @@
       <button class="filter-btn" onclick="filterBrowse('youtube',this)">یوتیوب</button>
       <button class="filter-btn" onclick="filterBrowse('telegram',this)">تلگرام</button>
     </div>
-    <div class="section" id="browse-list"><div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">پروژه‌ای پیدا نشد</div></div>
+    <div class="section" id="browse-list"><div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">پروژه‌ای پیدا نشد</div></div>
   </div>
   <div class="navbar">
     <div class="nav-item" onclick="showPage('admin-dashboard')"><div class="nav-icon">🏠</div>خانه</div>
@@ -865,11 +975,11 @@
     <div style="width:24px"></div>
   </div>
   <div class="page-content">
-    <div style="padding:16px;border-bottom:1px solid #3d2b20">
-      <div style="font-size:18px;font-weight:700;color:#f0e6d3;margin-bottom:8px" id="browse-detail-title"></div>
-      <div style="font-size:13px;color:#a08060;line-height:1.7" id="browse-detail-desc"></div>
+    <div style="padding:16px;border-bottom:1px solid var(--line)">
+      <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px" id="browse-detail-title"></div>
+      <div style="font-size:13px;color:var(--muted2);line-height:1.7" id="browse-detail-desc"></div>
     </div>
-    <div style="padding:16px;border-bottom:1px solid #3d2b20">
+    <div style="padding:16px;border-bottom:1px solid var(--line)">
       <div class="stats-grid" style="margin:0">
         <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-num" style="font-size:14px" id="browse-detail-budget">-</div><div class="stat-label">بودجه</div></div>
         <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-num" style="font-size:14px" id="browse-detail-type">-</div><div class="stat-label">نوع</div></div>
@@ -905,7 +1015,7 @@
       <button class="filter-btn" onclick="filterMyProjects('pending',this)">در انتظار</button>
       <button class="filter-btn" onclick="filterMyProjects('done',this)">تموم شده</button>
     </div>
-    <div class="section" id="my-projects-list"><div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز پروژه‌ای ندارید</div></div>
+    <div class="section" id="my-projects-list"><div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز پروژه‌ای ندارید</div></div>
   </div>
   <div class="navbar">
     <div class="nav-item" onclick="showPage('admin-dashboard')"><div class="nav-icon">🏠</div>خانه</div>
@@ -923,23 +1033,23 @@
     <div style="width:24px"></div>
   </div>
   <div class="page-content">
-    <div style="background:#4a3010;padding:10px 16px;text-align:center;font-size:13px;color:#e8b56d">⏳ در انتظار امضای شما</div>
-    <div style="padding:16px;border-bottom:1px solid #3d2b20">
-      <div style="font-size:13px;color:#8a7060;margin-bottom:12px">طرفین قرارداد</div>
+    <div style="background:var(--warn-bg);padding:10px 16px;text-align:center;font-size:13px;color:var(--warn)">⏳ در انتظار امضای شما</div>
+    <div style="padding:16px;border-bottom:1px solid var(--line)">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:12px">طرفین قرارداد</div>
       <div class="parties">
         <div class="party-card"><div class="party-avatar">👨‍💼</div><div class="party-role-label">کارفرما</div><div class="party-name" id="admin-contract-employer">-</div><div class="party-signed">✅ امضا شده</div></div>
         <div class="party-card"><div class="party-avatar">👨‍💻</div><div class="party-role-label">ادمین</div><div class="party-name" id="admin-contract-admin">-</div><div class="party-waiting">⏳ در انتظار</div></div>
       </div>
     </div>
-    <div style="padding:16px;border-bottom:1px solid #3d2b20">
-      <div style="font-size:13px;color:#8a7060;margin-bottom:10px">اطلاعات قرارداد</div>
+    <div style="padding:16px;border-bottom:1px solid var(--line)">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px">اطلاعات قرارداد</div>
       <div class="info-row"><div class="info-key">عنوان</div><div class="info-val" id="admin-contract-title">-</div></div>
       <div class="info-row"><div class="info-key">نوع</div><div class="info-val" id="admin-contract-type">-</div></div>
       <div class="info-row"><div class="info-key">مبلغ کل</div><div class="info-val hl" id="admin-contract-amount">-</div></div>
       <div class="info-row"><div class="info-key">کمیسیون پلتفرم</div><div class="info-val">۱۰٪</div></div>
       <div class="info-row"><div class="info-key">دریافتی شما</div><div class="info-val hl" id="admin-contract-net">-</div></div>
     </div>
-    <div style="padding:16px;border-bottom:1px solid #3d2b20">
+    <div style="padding:16px;border-bottom:1px solid var(--line)">
       <div class="clause"><div class="clause-num">بند ۱ — تعهدات ادمین</div><div class="clause-text">ادمین موظف است کار را طبق قرارداد و با کیفیت مشخص تحویل دهد.</div></div>
       <div class="clause"><div class="clause-num">بند ۲ — تعهدات کارفرما</div><div class="clause-text">کارفرما موظف است مبلغ را حداکثر ۳ روز پس از تحویل تایید کند.</div></div>
       <div class="clause"><div class="clause-num">بند ۳ — فسخ قرارداد</div><div class="clause-text">هر طرف می‌تواند با اطلاع ۱۵ روزه قرارداد را فسخ کند.</div></div>
@@ -948,7 +1058,7 @@
     <div style="padding:16px">
       <div class="sign-box">
         <div style="font-size:34px;margin-bottom:8px">✍️</div>
-        <div style="font-size:13px;color:#8a7060;margin-bottom:12px">با امضای این قرارداد تمام بندها را می‌پذیری</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:12px">با امضای این قرارداد تمام بندها را می‌پذیری</div>
         <label class="sign-checkbox"><input type="checkbox" id="admin-agree1" onchange="checkAdminSign()" /><span>تمام بندهای قرارداد را خواندم و می‌پذیرم</span></label>
         <label class="sign-checkbox"><input type="checkbox" id="admin-agree2" onchange="checkAdminSign()" /><span>متعهد به انجام کار در موعد مقرر هستم</span></label>
       </div>
@@ -967,7 +1077,7 @@
     <div class="logo" style="font-size:18px">gram<span>work</span></div>
   </div>
   <div class="page-content">
-    <div class="section" id="admin-chat-list-items"><div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">در حال بارگذاری...</div></div>
+    <div class="section" id="admin-chat-list-items"><div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">در حال بارگذاری...</div></div>
   </div>
   <div class="navbar">
     <div class="nav-item" onclick="showPage('admin-dashboard')"><div class="nav-icon">🏠</div>خانه</div>
@@ -986,11 +1096,11 @@
       <div class="chat-name" id="admin-chat-employer-name">کارفرما</div>
       <div class="chat-status">● آنلاین</div>
     </div>
-    <div style="font-size:20px;cursor:pointer;color:#8a7060" onclick="openAdminDelivery(currentAdminProjectId)">📋</div>
+    <div style="font-size:20px;cursor:pointer;color:var(--muted)" onclick="openAdminDelivery(currentAdminProjectId)">📋</div>
   </div>
-  <div style="background:#2a1f1a;margin:8px 12px;border:1px solid #3d2b20;border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
-    <div><div style="font-size:12px;color:#8a7060">پروژه فعال</div><div style="font-size:13px;font-weight:700;color:#e8956d" id="admin-chat-project-name">-</div></div>
-    <div style="font-size:11px;padding:3px 10px;border-radius:20px;background:#2d4a1e;color:#7bc67e">فعال</div>
+  <div style="background:var(--surface);margin:8px 12px;border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+    <div><div style="font-size:12px;color:var(--muted)">پروژه فعال</div><div style="font-size:13px;font-weight:700;color:var(--accent)" id="admin-chat-project-name">-</div></div>
+    <div style="font-size:11px;padding:3px 10px;border-radius:20px;background:var(--ok-bg);color:var(--ok)">فعال</div>
   </div>
   <div class="warning-msg">⚠️ برای امنیت بیشتر، تمام پرداخت‌ها از طریق گرام‌ورک انجام شود</div>
   <div class="chat-messages" id="admin-chat-messages"></div>
@@ -1029,7 +1139,7 @@
     </div>
     <div class="section">
       <div class="section-title" style="margin-bottom:12px">تحویلی‌های قبلی</div>
-      <div id="admin-deliveries-list"><div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز تحویلی ندارید</div></div>
+      <div id="admin-deliveries-list"><div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز تحویلی ندارید</div></div>
     </div>
   </div>
   <div class="bottom-bar">
@@ -1064,7 +1174,7 @@
           <button class="filter-tab" onclick="filterAdminWallet('withdraw',this)">برداشت</button>
         </div>
       </div>
-      <div id="admin-wallet-tx"><div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز تراکنشی ندارید</div></div>
+      <div id="admin-wallet-tx"><div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز تراکنشی ندارید</div></div>
     </div>
   </div>
 </div>
@@ -1073,7 +1183,7 @@
 <div class="page" id="page-admin-profile">
   <div class="header">
     <div class="header-title">پروفایل</div>
-    <div style="font-size:22px;cursor:pointer;color:#8a7060">⚙️</div>
+    <div style="font-size:22px;cursor:pointer;color:var(--muted)">⚙️</div>
   </div>
   <div class="page-content">
     <div class="profile-hero">
@@ -1104,12 +1214,16 @@
         <div class="menu-right"><div class="menu-icon">📄</div><div class="menu-label">قراردادهای من</div></div>
         <div class="menu-arrow">&#8592;</div>
       </div>
+      <div class="menu-item" onclick="showThemeModal()">
+        <div class="menu-right"><div class="menu-icon">🎨</div><div class="menu-label">تم ظاهر سایت</div></div>
+        <div class="menu-arrow">&#8592;</div>
+      </div>
       <div class="menu-item" onclick="showPage('support-chat')">
         <div class="menu-right"><div class="menu-icon">🎧</div><div class="menu-label">پشتیبانی</div></div>
         <div class="menu-arrow">&#8592;</div>
       </div>
     </div>
-    <button onclick="logout()" style="margin:16px;width:calc(100% - 32px);padding:14px;background:transparent;border:1px solid #e86d6d44;color:#e86d6d;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">🚪 خروج</button>
+    <button onclick="logout()" style="margin:16px;width:calc(100% - 32px);padding:14px;background:transparent;border:1px solid color-mix(in srgb, var(--err) 27%, transparent);color:var(--err);border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">🚪 خروج</button>
   </div>
   <div class="navbar">
     <div class="nav-item" onclick="showPage('admin-dashboard')"><div class="nav-icon">🏠</div>خانه</div>
@@ -1130,6 +1244,15 @@
     <button class="btn btn-secondary" onclick="hideWithdrawModal()">انصراف</button>
   </div>
 </div>
+<!-- ===== مودال تم ===== -->
+<div class="modal-overlay" id="theme-modal" onclick="if(event.target===this)hideThemeModal()">
+  <div class="modal">
+    <div class="modal-title">🎨 تم ظاهر سایت</div>
+    <div id="theme-list"></div>
+    <div id="accent-box" style="margin-bottom:14px"></div>
+    <button class="btn btn-secondary" onclick="hideThemeModal()">بستن</button>
+  </div>
+</div>
 <script>
   // ===== Supabase =====
   const { createClient } = window.supabase;
@@ -1137,6 +1260,90 @@
     'https://wrwrheromstdhvpymcdv.supabase.co',
     'sb_publishable_T1rfn5W0qQgS9RWMayrA7A_dU_G0r7m'
   );
+
+
+  // ===== تم‌ها =====
+  const THEMES = [
+    { id:'dark',  name:'تیره (پیش‌فرض)', desc:'همین ظاهر همیشگی', sw:['#1a1210','#2a1f1a','#e8956d'] },
+    { id:'clay',  name:'خاک‌رسی (Claymorphism)', desc:'نرم، گرد و برجسته', sw:['#e9e6f5','#f3f1fb','#7c6cf0'] },
+  ];
+
+  function currentThemeId() {
+    return document.documentElement.getAttribute('data-theme') || 'dark';
+  }
+
+  // ===== رنگ اصلی دلخواه (برای هر تم جدا ذخیره می‌شه) =====
+  const ACCENT_PRESETS = ['#e8956d', '#7c6cf0', '#2f9e5b', '#3b82c4', '#d6455d', '#d99a1e', '#ff2bd6'];
+  const HEX_RE = /^#[0-9a-f]{6}$/i;
+
+  function hexLum(h) {
+    const n = parseInt(h.slice(1), 16);
+    const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  }
+
+  function applyAccent(themeId) {
+    const root = document.documentElement;
+    ['--accent', '--accent2', '--on-accent', '--grad1', '--grad2'].forEach(v => root.style.removeProperty(v));
+    let c = null;
+    try { c = localStorage.getItem('gw_accent_' + themeId); } catch (e) {}
+    if (!c || !HEX_RE.test(c)) return;
+    root.style.setProperty('--accent', c);
+    root.style.setProperty('--accent2', 'color-mix(in srgb, ' + c + ' 78%, #000)');
+    root.style.setProperty('--on-accent', hexLum(c) > 0.6 ? '#1a1210' : '#ffffff');
+    root.style.setProperty('--grad1', 'color-mix(in srgb, ' + c + ' 28%, var(--bg))');
+    root.style.setProperty('--grad2', 'color-mix(in srgb, ' + c + ' 16%, var(--bg))');
+  }
+
+  function setAccent(c) {
+    if (!HEX_RE.test(c)) return;
+    try { localStorage.setItem('gw_accent_' + currentThemeId(), c); } catch (e) {}
+    applyAccent(currentThemeId());
+    renderThemeList();
+  }
+
+  function resetAccent() {
+    try { localStorage.removeItem('gw_accent_' + currentThemeId()); } catch (e) {}
+    applyAccent(currentThemeId());
+    renderThemeList();
+  }
+
+  function renderAccentBox() {
+    const box = document.getElementById('accent-box');
+    if (!box) return;
+    let cur = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    if (!HEX_RE.test(cur)) cur = '#7c6cf0';
+    box.innerHTML = `
+      <div style="font-size:13px;color:var(--muted2);margin-bottom:8px">🎨 رنگ اصلی دلخواه</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        ${ACCENT_PRESETS.map(c => `<span onclick="setAccent('${c}')" style="width:30px;height:30px;border-radius:50%;background:${c};cursor:pointer;border:3px solid ${c.toLowerCase() === cur.toLowerCase() ? 'var(--text)' : 'transparent'}"></span>`).join('')}
+        <input type="color" value="${cur}" oninput="setAccent(this.value)" style="width:34px;height:34px;border:none;background:none;padding:0;cursor:pointer" aria-label="انتخاب رنگ دلخواه" />
+        <span onclick="resetAccent()" style="font-size:12px;color:var(--accent);cursor:pointer;margin-right:auto">بازگشت به رنگ پیش‌فرض</span>
+      </div>`;
+  }
+
+  function applyTheme(id) {
+    if (!THEMES.some(t => t.id === id)) id = 'dark';
+    document.documentElement.setAttribute('data-theme', id);
+    try { localStorage.setItem('gw_theme', id); } catch (e) {}
+    applyAccent(id);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#1a1210');
+  }
+
+  function renderThemeList() {
+    const cur = currentThemeId();
+    document.getElementById('theme-list').innerHTML = THEMES.map(t => `
+      <div class="theme-opt ${t.id === cur ? 'active' : ''}" onclick="pickTheme('${t.id}')">
+        <div class="theme-sw">${t.sw.map(c => `<span style="background:${c}"></span>`).join('')}</div>
+        <div><div class="theme-name">${t.name}</div><div class="theme-desc">${t.desc}</div></div>
+      </div>`).join('');
+    renderAccentBox();
+  }
+
+  function pickTheme(id) { applyTheme(id); renderThemeList(); }
+  function showThemeModal() { renderThemeList(); document.getElementById('theme-modal').classList.add('show'); }
+  function hideThemeModal() { document.getElementById('theme-modal').classList.remove('show'); }
 
   // ===== state =====
   let currentPage = 'landing';
@@ -1217,23 +1424,23 @@
   async function loadPublicExplore() {
     const list = document.getElementById('explore-list');
     if (!list) return;
-    list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">در حال بارگذاری...</div>';
+    list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">در حال بارگذاری...</div>';
 
     if (exploreMode === 'employer') {
       const { data } = await sb.from('users').select('*').eq('role', 'admin').eq('banned', false).order('rating', { ascending: false }).limit(20);
-      if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز ادمینی ثبت‌نام نکرده</div>'; return; }
+      if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز ادمینی ثبت‌نام نکرده</div>'; return; }
       list.innerHTML = data.map(a => `
         <div class="available-card">
           <div class="project-top"><div class="project-title">${escapeHtml(a.full_name || 'ادمین')}</div>${a.verified ? '<div class="badge badge-active">✅ تایید شده</div>' : ''}</div>
-          <div style="font-size:12px;color:#8a7060">⭐ امتیاز: ${a.rating || 0}</div>
+          <div style="font-size:12px;color:var(--muted)">⭐ امتیاز: ${a.rating || 0}</div>
         </div>`).join('');
     } else {
       const { data } = await sb.from('projects').select('*').eq('status', 'pending').is('admin_id', null).order('created_at', { ascending: false }).limit(20);
-      if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">فعلاً پروژه‌ی بازی نیست</div>'; return; }
+      if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">فعلاً پروژه‌ی بازی نیست</div>'; return; }
       list.innerHTML = data.map(p => `
         <div class="available-card">
           <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge badge-new">باز</div></div>
-          <div style="font-size:13px;color:#8a7060;margin-bottom:8px;line-height:1.5">${escapeHtml((p.description || '').substring(0, 80))}${p.description && p.description.length > 80 ? '...' : ''}</div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.5">${escapeHtml((p.description || '').substring(0, 80))}${p.description && p.description.length > 80 ? '...' : ''}</div>
           <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
             <span class="info-tag">${p.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای'}</span>
             ${p.platform ? `<span class="info-tag">${escapeHtml(p.platform)}</span>` : ''}
@@ -1510,7 +1717,7 @@
 
       const list = document.getElementById('dash-projects-list');
       if (list) {
-        if (!projects.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز پروژه‌ای ندارید</div>'; }
+        if (!projects.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز پروژه‌ای ندارید</div>'; }
         else {
           list.innerHTML = projects.slice(0, 3).map(p => `
             <div class="project-card" onclick="openProjectDetail('${p.id}')">
@@ -1557,7 +1764,7 @@
     if (!list) return;
     let filtered = allProjects.filter(p => projectFilter === 'all' || p.status === projectFilter);
     if (projectSearch) filtered = filtered.filter(p => p.title.includes(projectSearch));
-    if (!filtered.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">پروژه‌ای پیدا نشد</div>'; return; }
+    if (!filtered.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">پروژه‌ای پیدا نشد</div>'; return; }
     list.innerHTML = filtered.map(p => `
       <div class="project-card" onclick="openProjectDetail('${p.id}')">
         <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge ${badgeCls(p.status)}">${badgeLabel(p.status)}</div></div>
@@ -1615,12 +1822,12 @@
     if (reqCount) reqCount.textContent = toFaDigits(reqs ? reqs.length : 0);
     if (reqList) {
       if (!reqs || !reqs.length) {
-        reqList.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز درخواستی نیست</div>';
+        reqList.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز درخواستی نیست</div>';
       } else {
         reqList.innerHTML = reqs.map(r => `
           <div class="request-card">
             <div class="req-top">
-              <div style="font-weight:700;color:#f0e6d3">${escapeHtml(r.admin?.full_name || 'ادمین')}</div>
+              <div style="font-weight:700;color:var(--text)">${escapeHtml(r.admin?.full_name || 'ادمین')}</div>
               <div class="req-price">${Number(r.price).toLocaleString()} تومان</div>
             </div>
             <div class="req-msg">${escapeHtml(r.message || '')}${r.deadline ? ' — زمان تحویل: ' + escapeHtml(r.deadline) : ''}</div>
@@ -1628,7 +1835,7 @@
             <div class="req-actions">
               <button class="btn-accept" onclick="acceptProposal('${r.id}','${r.admin_id}','${id}',${r.price},'${(r.deadline||'').replace(/'/g,"")}')">✅ قبول</button>
               <button class="btn-reject-sm" onclick="rejectProposal('${r.id}')">رد</button>
-            </div>` : `<div style="font-size:12px;color:${r.status === 'accepted' ? '#7bc67e' : '#e86d6d'}">${r.status === 'accepted' ? '✅ پذیرفته شده' : '❌ رد شده'}</div>`}
+            </div>` : `<div style="font-size:12px;color:${r.status === 'accepted' ? 'var(--ok)' : 'var(--err)'}">${r.status === 'accepted' ? '✅ پذیرفته شده' : '❌ رد شده'}</div>`}
           </div>`).join('');
       }
     }
@@ -1641,19 +1848,8 @@
 
   async function acceptProposal(proposalId, adminId, projectId, price, deadline) {
     if (!confirm('این درخواست رو قبول می‌کنی؟ بعد از قبول، باید قرارداد رو امضا کنی.')) return;
-    await sb.from('proposals').update({ status: 'accepted' }).eq('id', proposalId);
-    await sb.from('proposals').update({ status: 'rejected' }).eq('project_id', projectId).neq('id', proposalId);
-    await sb.from('projects').update({ admin_id: adminId }).eq('id', projectId);
-    await sb.from('contracts').insert({
-      project_id: projectId,
-      employer_id: currentUser.id,
-      admin_id: adminId,
-      amount: price,
-      duration: deadline,
-      employer_signed: false,
-      admin_signed: false,
-      status: 'pending'
-    });
+    const { error } = await sb.rpc('accept_proposal', { p_proposal_id: proposalId });
+    if (error) { alert('❌ ' + (error.message || 'خطا در قبول درخواست')); return; }
     alert('✅ درخواست قبول شد! حالا باید قرارداد رو امضا کنی.');
     openContractForProject(projectId);
   }
@@ -1838,7 +2034,7 @@
     const { data } = await sb.from('projects').select('*, admin:admin_id(full_name)').eq('employer_id', currentUser.id).eq('status', 'active').order('created_at', { ascending: false });
     const box = document.getElementById('chat-list-items');
     if (!box) return;
-    if (!data || !data.length) { box.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز پروژه‌ی فعالی نداری</div>'; return; }
+    if (!data || !data.length) { box.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز پروژه‌ی فعالی نداری</div>'; return; }
     box.innerHTML = data.map(p => `
       <div class="project-card" onclick="openEmployerChat('${p.id}')">
         <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge badge-active">فعال</div></div>
@@ -1875,7 +2071,7 @@
     allWalletTx = txs;
     const list = document.getElementById('wallet-tx-list');
     if (!list) return;
-    if (!txs.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز تراکنشی ندارید</div>'; return; }
+    if (!txs.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز تراکنشی ندارید</div>'; return; }
     list.innerHTML = txs.map(t => `
       <div class="tx-card">
         <div class="tx-right">
@@ -1963,14 +2159,14 @@
     const { data: dels } = await sb.from('deliveries').select('*').eq('project_id', projectId).order('created_at', { ascending: false });
     const list = document.getElementById('deliveries-list');
     if (!list) return;
-    if (!dels || !dels.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز تحویلی ندارید</div>'; return; }
+    if (!dels || !dels.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز تحویلی ندارید</div>'; return; }
     list.innerHTML = dels.map(d => `
       <div class="delivery-card">
-        <div style="font-weight:700;color:#f0e6d3;margin-bottom:6px">${escapeHtml(d.title)}</div>
-        ${d.description ? `<div style="font-size:12px;color:#8a7060;margin-bottom:8px">${escapeHtml(d.description)}</div>` : ''}
+        <div style="font-weight:700;color:var(--text);margin-bottom:6px">${escapeHtml(d.title)}</div>
+        ${d.description ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px">${escapeHtml(d.description)}</div>` : ''}
         <div class="delivery-link"><div class="delivery-link-text">${escapeHtml(d.file_link)}</div></div>
-        <a href="${safeUrl(d.file_link)}" target="_blank" style="display:block;text-align:center;font-size:12px;color:#e8956d;margin-top:4px">مشاهده فایل</a>
-        <div style="margin-top:8px;font-size:12px;color:${d.status === 'approved' ? '#7bc67e' : d.status === 'rejected' ? '#e86d6d' : '#e8b56d'}">
+        <a href="${safeUrl(d.file_link)}" target="_blank" style="display:block;text-align:center;font-size:12px;color:var(--accent);margin-top:4px">مشاهده فایل</a>
+        <div style="margin-top:8px;font-size:12px;color:${d.status === 'approved' ? 'var(--ok)' : d.status === 'rejected' ? 'var(--err)' : 'var(--warn)'}">
           ${d.status === 'approved' ? '✅ تایید شده' : d.status === 'rejected' ? '❌ رد شده' : '⏳ در انتظار بررسی'}
         </div>
       </div>`).join('');
@@ -2004,19 +2200,19 @@
       if (sd) sd.textContent = done;
 
       const activeList = document.getElementById('admin-active-list');
-      const activeProjects = projects.filter(p => p.status === 'active');
+      const activeProjects = projects.filter(p => p.status === 'active' || p.status === 'pending');
       if (activeList) {
-        if (!activeProjects.length) { activeList.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز پروژه فعالی ندارید</div>'; }
+        if (!activeProjects.length) { activeList.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز پروژه فعالی ندارید</div>'; }
         else {
           activeList.innerHTML = activeProjects.map(p => `
             <div class="project-card">
-              <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge badge-active">فعال</div></div>
+              <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div>${p.status === 'pending' ? '<div class="badge badge-pending">منتظر امضای قرارداد</div>' : '<div class="badge badge-active">فعال</div>'}</div>
               <div class="project-meta">${p.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای'}</div>
               <div class="project-price">${Number(p.budget * 0.9).toLocaleString()} تومان</div>
-              <div style="display:flex;gap:8px;margin-top:10px;border-top:1px solid #3d2b20;padding-top:10px">
-                <button style="flex:1;padding:8px;background:#e8956d;color:#1a1210;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="openAdminContractForProject('${p.id}')">قرارداد</button>
-                <button style="flex:1;padding:8px;background:transparent;border:1px solid #e8956d;color:#e8956d;border-radius:10px;font-size:12px;cursor:pointer;font-family:inherit" onclick="openAdminDelivery('${p.id}')">تحویل</button>
-                <button style="padding:8px 12px;background:transparent;border:1px solid #3d2b20;color:#8a7060;border-radius:10px;font-size:12px;cursor:pointer;font-family:inherit" onclick="openAdminChat('${p.id}')">💬</button>
+              <div style="display:flex;gap:8px;margin-top:10px;border-top:1px solid var(--line);padding-top:10px">
+                <button style="flex:1;padding:8px;background:var(--accent);color:var(--on-accent);border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="openAdminContractForProject('${p.id}')">قرارداد</button>
+                <button style="flex:1;padding:8px;background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:10px;font-size:12px;cursor:pointer;font-family:inherit" onclick="openAdminDelivery('${p.id}')">تحویل</button>
+                <button style="padding:8px 12px;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;font-size:12px;cursor:pointer;font-family:inherit" onclick="openAdminChat('${p.id}')">💬</button>
               </div>
             </div>`).join('');
         }
@@ -2027,7 +2223,7 @@
     const { data: newProjects } = await sb.from('projects').select('*, users!employer_id(full_name)').eq('status', 'pending').is('admin_id', null).limit(3);
     const newList = document.getElementById('admin-new-list');
     if (newList) {
-      if (!newProjects || !newProjects.length) { newList.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">پروژه‌ای موجود نیست</div>'; }
+      if (!newProjects || !newProjects.length) { newList.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">پروژه‌ای موجود نیست</div>'; }
       else {
         newList.innerHTML = newProjects.map(p => `
           <div class="available-card">
@@ -2038,7 +2234,7 @@
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center">
               <div class="project-price">${Number(p.budget).toLocaleString()} تومان</div>
-              <button style="padding:8px 16px;background:#e8956d;color:#1a1210;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="openBrowseDetail('${p.id}')">مشاهده</button>
+              <button style="padding:8px 16px;background:var(--accent);color:var(--on-accent);border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="openBrowseDetail('${p.id}')">مشاهده</button>
             </div>
           </div>`).join('');
       }
@@ -2068,18 +2264,18 @@
     let filtered = allBrowse;
     if (browseFilter !== 'all') filtered = filtered.filter(p => p.type === browseFilter || p.platform === browseFilter);
     if (browseSearch) filtered = filtered.filter(p => p.title.includes(browseSearch) || (p.description || '').includes(browseSearch));
-    if (!filtered.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">پروژه‌ای پیدا نشد</div>'; return; }
+    if (!filtered.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">پروژه‌ای پیدا نشد</div>'; return; }
     list.innerHTML = filtered.map(p => `
       <div class="available-card">
         <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge badge-new">جدید</div></div>
-        <div style="font-size:13px;color:#8a7060;margin-bottom:10px;line-height:1.5">${escapeHtml((p.description || '').substring(0, 80))}${p.description && p.description.length > 80 ? '...' : ''}</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.5">${escapeHtml((p.description || '').substring(0, 80))}${p.description && p.description.length > 80 ? '...' : ''}</div>
         <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
           <span class="info-tag">${p.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای'}</span>
           ${p.platform ? `<span class="info-tag">${escapeHtml(p.platform)}</span>` : ''}
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div class="project-price">${Number(p.budget).toLocaleString()} تومان</div>
-          <button style="padding:8px 16px;background:#e8956d;color:#1a1210;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="openBrowseDetail('${p.id}')">مشاهده</button>
+          <button style="padding:8px 16px;background:var(--accent);color:var(--on-accent);border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="openBrowseDetail('${p.id}')">مشاهده</button>
         </div>
       </div>`).join('');
   }
@@ -2155,16 +2351,16 @@
     const list = document.getElementById('my-projects-list');
     if (!list) return;
     let filtered = myProjectFilter === 'all' ? allMyProjects : allMyProjects.filter(p => p.status === myProjectFilter);
-    if (!filtered.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز پروژه‌ای ندارید</div>'; return; }
+    if (!filtered.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز پروژه‌ای ندارید</div>'; return; }
     list.innerHTML = filtered.map(p => `
       <div class="project-card">
         <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge ${badgeCls(p.status)}">${badgeLabel(p.status)}</div></div>
         <div class="project-meta">${p.type === 'monthly' ? 'ماهانه' : 'پروژه‌ای'}</div>
         <div class="project-price">${Number(p.budget * 0.9).toLocaleString()} تومان (دریافتی شما)</div>
-        <div style="display:flex;gap:8px;margin-top:10px;border-top:1px solid #3d2b20;padding-top:10px">
-          <button style="flex:1;padding:8px;background:#e8956d;color:#1a1210;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="openAdminContractForProject('${p.id}')">قرارداد</button>
-          <button style="flex:1;padding:8px;background:transparent;border:1px solid #e8956d;color:#e8956d;border-radius:10px;font-size:12px;cursor:pointer;font-family:inherit" onclick="openAdminDelivery('${p.id}')">تحویل</button>
-          <button style="padding:8px 12px;background:transparent;border:1px solid #3d2b20;color:#8a7060;border-radius:10px;font-size:12px;cursor:pointer;font-family:inherit" onclick="openAdminChat('${p.id}')">💬</button>
+        <div style="display:flex;gap:8px;margin-top:10px;border-top:1px solid var(--line);padding-top:10px">
+          <button style="flex:1;padding:8px;background:var(--accent);color:var(--on-accent);border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="openAdminContractForProject('${p.id}')">قرارداد</button>
+          <button style="flex:1;padding:8px;background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:10px;font-size:12px;cursor:pointer;font-family:inherit" onclick="openAdminDelivery('${p.id}')">تحویل</button>
+          <button style="padding:8px 12px;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;font-size:12px;cursor:pointer;font-family:inherit" onclick="openAdminChat('${p.id}')">💬</button>
         </div>
       </div>`).join('');
   }
@@ -2237,7 +2433,7 @@
     const { data } = await sb.from('projects').select('*, employer:employer_id(full_name)').eq('admin_id', currentUser.id).eq('status', 'active').order('created_at', { ascending: false });
     const box = document.getElementById('admin-chat-list-items');
     if (!box) return;
-    if (!data || !data.length) { box.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز پروژه‌ی فعالی نداری</div>'; return; }
+    if (!data || !data.length) { box.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز پروژه‌ی فعالی نداری</div>'; return; }
     box.innerHTML = data.map(p => `
       <div class="project-card" onclick="openAdminChat('${p.id}')">
         <div class="project-top"><div class="project-title">${escapeHtml(p.title)}</div><div class="badge badge-active">فعال</div></div>
@@ -2334,13 +2530,13 @@
     const { data: dels } = await sb.from('deliveries').select('*').eq('project_id', projectId).order('created_at', { ascending: false });
     const list = document.getElementById('admin-deliveries-list');
     if (!list) return;
-    if (!dels || !dels.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز تحویلی ندارید</div>'; return; }
+    if (!dels || !dels.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز تحویلی ندارید</div>'; return; }
     list.innerHTML = dels.map(d => `
       <div class="delivery-card">
-        <div style="font-weight:700;color:#f0e6d3;margin-bottom:6px">${escapeHtml(d.title)}</div>
-        ${d.description ? `<div style="font-size:12px;color:#8a7060;margin-bottom:8px">${escapeHtml(d.description)}</div>` : ''}
+        <div style="font-weight:700;color:var(--text);margin-bottom:6px">${escapeHtml(d.title)}</div>
+        ${d.description ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px">${escapeHtml(d.description)}</div>` : ''}
         <div class="delivery-link"><div class="delivery-link-text">${escapeHtml(d.file_link)}</div></div>
-        <div style="margin-top:8px;font-size:12px;color:${d.status === 'approved' ? '#7bc67e' : d.status === 'rejected' ? '#e86d6d' : '#e8b56d'}">
+        <div style="margin-top:8px;font-size:12px;color:${d.status === 'approved' ? 'var(--ok)' : d.status === 'rejected' ? 'var(--err)' : 'var(--warn)'}">
           ${d.status === 'approved' ? '✅ تایید شده' : d.status === 'rejected' ? '❌ رد شده' + (d.reject_reason ? ' — ' + escapeHtml(d.reject_reason) : '') : '⏳ در انتظار بررسی کارفرما'}
         </div>
       </div>`).join('');
@@ -2392,7 +2588,7 @@
     allAdminTx = txs;
     const list = document.getElementById('admin-wallet-tx');
     if (!list) return;
-    if (!txs.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز تراکنشی ندارید</div>'; return; }
+    if (!txs.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز تراکنشی ندارید</div>'; return; }
     list.innerHTML = txs.map(t => `
       <div class="tx-card">
         <div class="tx-right">
@@ -2439,6 +2635,7 @@
   // نشست از خود Supabase Auth خونده می‌شه (امضاشده و امن)، نه از localStorage خام —
   // چون قبلاً هرکسی می‌تونست با تغییر localStorage خودش رو جای هرکسی دیگه جا بزنه.
   window.addEventListener('load', async () => {
+    applyTheme(currentThemeId());
     const { data } = await sb.auth.getSession();
     if (!data.session) return;
     const { data: profile } = await sb.from('users').select('*').eq('auth_uid', data.session.user.id).maybeSingle();
