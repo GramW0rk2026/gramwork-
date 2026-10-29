@@ -598,6 +598,7 @@
     <div class="subpage" id="np-p3">
       <div class="input-group"><label>شرایط خاص (اختیاری)</label><textarea id="np-conditions" placeholder="هر چیزی که ادمین باید بدونه..."></textarea></div>
       <div class="input-group"><label>مهلت ارسال درخواست</label><input type="text" id="np-deadline" placeholder="مثلاً: ۳ روز" /></div>
+      <div id="np-funds-box"></div>
       <div class="error-box" id="np-error"></div>
       <div class="loading-box" id="np-loading">⏳ در حال ثبت...</div>
       <button class="btn btn-primary" onclick="submitProject()">✅ ثبت پروژه</button>
@@ -738,7 +739,7 @@
       <div class="wallet-note">🔒 قفل شده: <b id="wallet-locked">۰ تومان</b></div>
       <div class="wallet-actions">
         <button class="wallet-btn wallet-btn-charge" onclick="showChargeModal()">+ شارژ</button>
-        <button class="wallet-btn wallet-btn-withdraw">برداشت</button>
+        <button class="wallet-btn wallet-btn-withdraw" onclick="showWithdrawModal()">برداشت</button>
       </div>
     </div>
     <div class="stats-grid">
@@ -867,6 +868,7 @@
 <div class="modal-overlay" id="charge-modal">
   <div class="modal">
     <div class="modal-title">شارژ کیف پول</div>
+    <div id="charge-min-note" style="display:none;background:var(--bg);border:1px solid var(--accent);border-radius:12px;padding:10px 12px;margin-bottom:14px;font-size:13px;color:var(--accent);text-align:center;line-height:1.8"></div>
     <div class="amount-options">
       <div class="amount-btn" onclick="selectAmount('500000',this)">۵۰۰ هزار</div>
       <div class="amount-btn" onclick="selectAmount('1000000',this)">۱ میلیون</div>
@@ -1237,8 +1239,26 @@
 <div class="modal-overlay" id="withdraw-modal">
   <div class="modal">
     <div class="modal-title">برداشت از کیف پول</div>
-    <div class="input-group"><label>مبلغ برداشت (تومان)</label><input type="number" id="withdraw-amount" placeholder="حداقل ۱۰۰,۰۰۰ تومان" /></div>
-    <div class="input-group"><label>شماره کارت</label><input type="text" id="withdraw-card" placeholder="۱۶ رقم شماره کارت" maxlength="16" /></div>
+    <div style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:14px;text-align:center">
+      <div style="font-size:12px;color:var(--muted2);margin-bottom:4px">موجودی قابل برداشت</div>
+      <div style="font-size:20px;font-weight:900;color:var(--accent)" id="withdraw-balance">۰ تومان</div>
+    </div>
+    <div class="type-select" style="margin-bottom:12px">
+      <div class="type-btn active" id="wd-mode-all" onclick="setWithdrawMode('all')"><span class="ticon">💯</span>کل موجودی<div id="wd-all-label" style="font-size:11px;margin-top:4px"></div></div>
+      <div class="type-btn" id="wd-mode-custom" onclick="setWithdrawMode('custom')"><span class="ticon">✏️</span>مبلغ دلخواه</div>
+    </div>
+    <div class="input-group" id="wd-custom-box" style="display:none">
+      <label>مبلغ برداشت (تومان)</label>
+      <input type="number" inputmode="numeric" id="withdraw-amount" placeholder="مبلغ دلخواه" />
+      <div id="wd-custom-hint" style="font-size:11px;color:var(--faint);margin-top:6px;line-height:1.7"></div>
+    </div>
+    <div style="font-size:13px;color:var(--muted2);margin:4px 0 10px">🏦 اطلاعات حساب مقصد (دقیقاً مثل بانک)</div>
+    <div class="input-group"><label>شماره شبا *</label><input type="text" id="withdraw-sheba" placeholder="IR000000000000000000000000" maxlength="30" style="direction:ltr;text-align:left" /></div>
+    <div class="input-group"><label>نام صاحب حساب *</label><input type="text" id="withdraw-first" placeholder="مثلاً: محمد" /></div>
+    <div class="input-group"><label>نام خانوادگی صاحب حساب *</label><input type="text" id="withdraw-last" placeholder="مثلاً: رضایی" /></div>
+    <div class="input-group"><label>پسوند فامیلی (اگه داره)</label><input type="text" id="withdraw-suffix" placeholder="مثلاً: زاده، پور، نژاد" /></div>
+    <div class="input-group"><label>شماره کارت (اختیاری)</label><input type="text" inputmode="numeric" id="withdraw-card" placeholder="۱۶ رقم شماره کارت" maxlength="16" /></div>
+    <div style="font-size:11px;color:var(--faint);margin-bottom:12px;line-height:1.8">برداشت‌ها به‌صورت دستی انجام می‌شن. اگه اسم یا شبا اشتباه باشه، واریز انجام نمی‌شه.</div>
     <div class="error-box" id="withdraw-error"></div>
     <button class="btn btn-primary" onclick="doWithdraw()">تایید برداشت</button>
     <button class="btn btn-secondary" onclick="hideWithdrawModal()">انصراف</button>
@@ -1370,6 +1390,7 @@
     window.scrollTo(0, 0);
 
     // لود داده برای صفحه
+    if (name === 'new-project') { restoreProjectDraft(); if (npStep === 3) renderProjectFundsBox(); }
     if (name === 'dashboard') loadDashboard();
     if (name === 'projects') loadProjects();
     if (name === 'wallet') loadWallet();
@@ -1572,7 +1593,8 @@
       const smsData = await smsRes.json();
       showLoad('login-loading', false);
       if (!smsData.success) {
-        showErr('login-error', 'خطا در ارسال پیامک — دوباره تلاش کن');
+        // پیام محدودیت (۴۲۹) رو که برای کاربر قابل‌فهمه عیناً نشون بده
+        showErr('login-error', (smsRes.status === 429 && typeof smsData.error === 'string') ? smsData.error : 'خطا در ارسال پیامک — دوباره تلاش کن');
         return;
       }
     } catch (e) {
@@ -1621,7 +1643,7 @@
     showLoad('otp-loading', true);
 
     const { data: ok, error: rpcErr } = await sb.rpc('verify_otp_code', { p_phone: pendingAuth.phone, p_code: code });
-    if (rpcErr || !ok) { showLoad('otp-loading', false); showErr('otp-error', 'کد اشتباه یا منقضی شده'); return; }
+    if (rpcErr || !ok) { showLoad('otp-loading', false); showErr('otp-error', 'کد اشتباه یا منقضی شده — بعد از چند بار اشتباه باید یه کد جدید بگیری'); return; }
 
     if (pendingAuth.type === 'register') {
       const { data: rawSignUp, error: signUpErr } = await sb.auth.signUp({
@@ -1882,7 +1904,7 @@
     if (lbl) lbl.textContent = npLabels[npStep - 1];
   }
 
-  function npNext() { if (npStep < 3) { npStep++; updateNpSteps(); } }
+  function npNext() { if (npStep < 3) { npStep++; updateNpSteps(); if (npStep === 3) renderProjectFundsBox(); } }
   function npPrev() {
     if (npStep > 1) { npStep--; updateNpSteps(); }
     else { npStep = 1; updateNpSteps(); goBack(); }
@@ -1896,24 +1918,123 @@
     document.getElementById('type-project').classList.toggle('active', type === 'project');
   }
 
+  // ===== موجودی لازم برای ثبت پروژه =====
+  let chargeMinAmount = 0; // وقتی شارژ از مسیر «ثبت پروژه» باز می‌شه، حداقل مبلغ لازم
+
+  function toLatinDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+      .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+  }
+
+  async function getMyBalance() {
+    const { data: w } = await sb.from('wallets').select('balance').eq('user_id', currentUser.id).maybeSingle();
+    return Number((w && w.balance) || 0);
+  }
+
+  function saveProjectDraft() {
+    try {
+      localStorage.setItem('gw_project_draft', JSON.stringify({
+        title: document.getElementById('np-title').value,
+        desc: document.getElementById('np-desc').value,
+        budget: document.getElementById('np-budget').value,
+        duration: document.getElementById('np-duration').value,
+        platform: document.getElementById('np-platform').value,
+        conditions: document.getElementById('np-conditions').value,
+        deadline: document.getElementById('np-deadline').value,
+        type: selectedContractType,
+        skills: Array.from(document.querySelectorAll('#np-p1 .skill-select.active')).map(e => e.textContent.trim())
+      }));
+    } catch (e) {}
+  }
+
+  function clearProjectDraft() { try { localStorage.removeItem('gw_project_draft'); } catch (e) {} }
+
+  function restoreProjectDraft() {
+    let d = null;
+    try { d = JSON.parse(localStorage.getItem('gw_project_draft') || 'null'); } catch (e) {}
+    if (!d) return;
+    const t = document.getElementById('np-title');
+    if (!t || t.value || document.getElementById('np-desc').value || document.getElementById('np-budget').value) return;
+    t.value = d.title || '';
+    document.getElementById('np-desc').value = d.desc || '';
+    document.getElementById('np-budget').value = d.budget || '';
+    document.getElementById('np-duration').value = d.duration || '';
+    document.getElementById('np-platform').value = d.platform || '';
+    document.getElementById('np-conditions').value = d.conditions || '';
+    document.getElementById('np-deadline').value = d.deadline || '';
+    if (d.type) selectType(d.type);
+    const skills = d.skills || [];
+    document.querySelectorAll('#np-p1 .skill-select').forEach(e => e.classList.toggle('active', skills.includes(e.textContent.trim())));
+  }
+
+  async function renderProjectFundsBox() {
+    const box = document.getElementById('np-funds-box');
+    if (!box || !currentUser) return;
+    const budget = parseInt(toLatinDigits(document.getElementById('np-budget').value)) || 0;
+    if (!budget) { box.innerHTML = ''; return; }
+    const bal = await getMyBalance();
+    const short = budget - bal;
+    const card = 'background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.9;color:var(--text)';
+    if (short <= 0) {
+      box.innerHTML = `<div style="${card}">✅ موجودی کیف پولت (<b>${bal.toLocaleString()}</b> تومان) برای بودجه‌ی این پروژه (<b>${budget.toLocaleString()}</b> تومان) کافیه.</div>`;
+      return;
+    }
+    box.innerHTML = `
+      <div style="${card}">
+        ⚠️ برای ثبت این پروژه باید موجودی کیف پولت حداقل به اندازه‌ی بودجه‌اش باشه.<br>
+        بودجه‌ی پروژه: <b>${budget.toLocaleString()}</b> تومان — موجودی تو: <b>${bal.toLocaleString()}</b> تومان — کمبود: <b style="color:var(--accent)">${short.toLocaleString()}</b> تومان
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
+          <button class="btn btn-primary" style="margin:0;max-width:none" onclick="chargeForProject(${short})">شارژ مابه‌التفاوت (${short.toLocaleString()} تومان)</button>
+          ${bal > 0 ? `<button class="btn btn-secondary" style="margin:0;max-width:none" onclick="chargeForProject(${budget})">شارژ کل مبلغ پروژه (${budget.toLocaleString()} تومان)</button>` : ''}
+          <div style="display:flex;gap:8px">
+            <input type="number" inputmode="numeric" id="np-custom-charge" placeholder="مبلغ دلخواه (حداقل ${short.toLocaleString()})" style="flex:1;min-width:0;padding:11px 12px;background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--text);font-family:inherit;font-size:13px;text-align:right" />
+            <button class="btn btn-secondary" style="margin:0;width:auto;max-width:none;padding:0 16px" onclick="chargeForProject(parseInt(document.getElementById('np-custom-charge').value)||0, ${short})">شارژ</button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function chargeForProject(amount, minAmount) {
+    const budget = parseInt(toLatinDigits(document.getElementById('np-budget').value)) || 0;
+    getMyBalance().then(bal => {
+      const need = Math.max(0, budget - bal);
+      const min = minAmount || need;
+      if (!amount || amount < min) { showErr('np-error', 'مبلغ شارژ باید حداقل ' + min.toLocaleString() + ' تومان باشه تا موجودیت به بودجه‌ی پروژه برسه'); return; }
+      hideErr('np-error');
+      saveProjectDraft();
+      showChargeModal(min);
+      document.getElementById('charge-amount').value = amount;
+    });
+  }
+
   async function submitProject() {
     if (!currentUser) { alert('اول باید ثبت‌نام یا وارد بشی'); goLogin(); return; }
     hideErr('np-error');
     const title = document.getElementById('np-title').value.trim();
     const desc = document.getElementById('np-desc').value.trim();
-    const budget = document.getElementById('np-budget').value.trim();
+    const budget = parseInt(toLatinDigits(document.getElementById('np-budget').value));
     if (!title || !desc || !budget) { showErr('np-error', 'همه فیلدهای اجباری رو پر کن'); return; }
     showLoad('np-loading', true);
-    const { error } = await sb.from('projects').insert({
-      employer_id: currentUser.id,
-      title, description: desc,
-      type: selectedContractType,
-      budget: parseInt(budget),
-      platform: document.getElementById('np-platform').value,
-      status: 'pending'
+
+    const bal = await getMyBalance();
+    if (bal < budget) {
+      showLoad('np-loading', false);
+      saveProjectDraft();
+      renderProjectFundsBox();
+      showErr('np-error', 'موجودی کیف پولت از بودجه‌ی پروژه کمتره — اول شارژ کن، بعد دوباره ثبت رو بزن (اطلاعات پروژه‌ت ذخیره می‌مونه)');
+      return;
+    }
+
+    const { error } = await sb.rpc('create_project', {
+      p_title: title, p_description: desc, p_type: selectedContractType,
+      p_budget: budget, p_platform: document.getElementById('np-platform').value
     });
     showLoad('np-loading', false);
-    if (error) { showErr('np-error', 'خطا در ثبت پروژه — دوباره تلاش کن'); return; }
+    if (error) { showErr('np-error', error.message || 'خطا در ثبت پروژه — دوباره تلاش کن'); return; }
+    clearProjectDraft();
+    ['np-title', 'np-desc', 'np-budget', 'np-duration', 'np-conditions', 'np-deadline'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+    document.querySelectorAll('#np-p1 .skill-select.active').forEach(e => e.classList.remove('active'));
     npStep = 1; updateNpSteps();
     alert('✅ پروژه با موفقیت ثبت شد!');
     showPage('projects');
@@ -2090,8 +2211,16 @@
     renderWalletTx(filtered);
   }
 
-  function showChargeModal() { document.getElementById('charge-modal').classList.add('show'); }
-  function hideChargeModal() { document.getElementById('charge-modal').classList.remove('show'); }
+  function showChargeModal(minAmount) {
+    chargeMinAmount = Number(minAmount) > 0 ? Number(minAmount) : 0;
+    const note = document.getElementById('charge-min-note');
+    if (note) {
+      if (chargeMinAmount) { note.style.display = 'block'; note.textContent = 'برای ثبت پروژه‌ات حداقل ' + chargeMinAmount.toLocaleString() + ' تومان باید شارژ کنی.'; }
+      else { note.style.display = 'none'; note.textContent = ''; }
+    }
+    document.getElementById('charge-modal').classList.add('show');
+  }
+  function hideChargeModal() { document.getElementById('charge-modal').classList.remove('show'); chargeMinAmount = 0; }
 
   function selectAmount(val, btn) {
     document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
@@ -2106,6 +2235,7 @@
     const fileInput = document.getElementById('charge-receipt');
     const file = fileInput.files[0];
     if (!amount) { showErr('charge-error', 'مبلغ رو وارد کن'); return; }
+    if (chargeMinAmount && parseInt(amount) < chargeMinAmount) { showErr('charge-error', 'برای ثبت این پروژه حداقل ' + chargeMinAmount.toLocaleString() + ' تومان باید شارژ کنی'); return; }
     if (!file) { showErr('charge-error', 'عکس رسید رو انتخاب کن'); return; }
 
     showLoad('charge-loading', true);
@@ -2131,7 +2261,10 @@
     showLoad('charge-loading', false);
     if (txError) { showErr('charge-error', 'خطا در ثبت درخواست — دوباره تلاش کن'); return; }
 
-    alert('✅ درخواست شارژ ثبت شد!\nبعد از تایید سوپرادمین، موجودی کیف‌پولت اضافه می‌شه.');
+    const fromProject = chargeMinAmount > 0;
+    alert(fromProject
+      ? '✅ درخواست شارژ ثبت شد!\nبعد از تایید سوپرادمین و اضافه‌شدن به موجودیت، دوباره برگرد و «ثبت پروژه» رو بزن. اطلاعات پروژه‌ت ذخیره می‌مونه.'
+      : '✅ درخواست شارژ ثبت شد!\nبعد از تایید سوپرادمین، موجودی کیف‌پولت اضافه می‌شه.');
     hideChargeModal();
     document.getElementById('charge-amount').value = '';
     fileInput.value = '';
@@ -2607,25 +2740,85 @@
     renderAdminWalletTx(filtered);
   }
 
-  function showWithdrawModal() { document.getElementById('withdraw-modal').classList.add('show'); }
+  // ===== برداشت از کیف پول (کارفرما و ادمین) =====
+  let wdBalance = 0, wdMin = 1000000, wdMax = 20000000, wdMode = 'all';
+
+  async function showWithdrawModal() {
+    if (!currentUser) return;
+    hideErr('withdraw-error');
+    document.getElementById('withdraw-amount').value = '';
+    ['withdraw-card', 'withdraw-sheba', 'withdraw-first', 'withdraw-last', 'withdraw-suffix'].forEach(id => { document.getElementById(id).value = ''; });
+    wdBalance = await getMyBalance();
+    const { data: st } = await sb.from('settings').select('key,value').in('key', ['min_withdraw', 'max_withdraw']);
+    (st || []).forEach(r => {
+      const v = parseInt(r.value);
+      if (!isNaN(v)) { if (r.key === 'min_withdraw') wdMin = v; if (r.key === 'max_withdraw') wdMax = v; }
+    });
+    document.getElementById('withdraw-balance').textContent = wdBalance.toLocaleString() + ' تومان';
+    setWithdrawMode('all');
+    document.getElementById('withdraw-modal').classList.add('show');
+  }
+
   function hideWithdrawModal() { document.getElementById('withdraw-modal').classList.remove('show'); }
 
+  function setWithdrawMode(mode) {
+    wdMode = mode;
+    document.getElementById('wd-mode-all').classList.toggle('active', mode === 'all');
+    document.getElementById('wd-mode-custom').classList.toggle('active', mode === 'custom');
+    document.getElementById('wd-custom-box').style.display = mode === 'custom' ? 'block' : 'none';
+    const allAmt = Math.min(wdBalance, wdMax);
+    document.getElementById('wd-all-label').textContent = wdBalance <= 0 ? 'موجودی نداری'
+      : allAmt.toLocaleString() + ' تومان' + (wdBalance > wdMax ? ' (سقف مجاز)' : '');
+    const hint = document.getElementById('wd-custom-hint');
+    if (wdBalance < wdMin) hint.textContent = 'موجودیت از حداقل مبلغ دلخواه (' + wdMin.toLocaleString() + ' تومان) کمتره؛ فقط می‌تونی «کل موجودی» رو برداری.';
+    else hint.textContent = 'از ' + wdMin.toLocaleString() + ' تا ' + Math.min(wdMax, wdBalance).toLocaleString() + ' تومان (بیشتر از موجودیت نمی‌شه)';
+  }
+
+  // شبای معتبر: IR + ۲۴ رقم و رقم کنترلی (mod 97) درست
+  function normalizeSheba(v) {
+    let x = toLatinDigits(v).replace(/\s/g, '').toUpperCase();
+    if (/^\d{24}$/.test(x)) x = 'IR' + x;
+    return x;
+  }
+  function isValidSheba(x) {
+    if (!/^IR\d{24}$/.test(x)) return false;
+    const digits = x.slice(4) + '1827' + x.slice(2, 4);
+    let rem = 0;
+    for (const ch of digits) rem = (rem * 10 + Number(ch)) % 97;
+    return rem === 1;
+  }
+
   async function doWithdraw() {
-    const amount = document.getElementById('withdraw-amount').value;
-    const card = document.getElementById('withdraw-card').value;
     hideErr('withdraw-error');
-    if (!amount || !card || card.length !== 16) { showErr('withdraw-error', 'مبلغ و شماره کارت ۱۶ رقمی رو وارد کن'); return; }
-    const { error } = await sb.rpc('request_withdrawal', { p_amount: parseInt(amount), p_card: card });
+    const card = toLatinDigits(document.getElementById('withdraw-card').value).replace(/\D/g, '');
+    const sheba = normalizeSheba(document.getElementById('withdraw-sheba').value);
+    const first = document.getElementById('withdraw-first').value.trim();
+    const last = document.getElementById('withdraw-last').value.trim();
+    const suffix = document.getElementById('withdraw-suffix').value.trim();
+    if (wdBalance <= 0) { showErr('withdraw-error', 'موجودی‌ای برای برداشت نداری'); return; }
+    if (!isValidSheba(sheba)) { showErr('withdraw-error', 'شماره شبا معتبر نیست — به شکل IR و ۲۴ رقم وارد کن'); return; }
+    if (first.length < 2) { showErr('withdraw-error', 'نام صاحب حساب رو وارد کن'); return; }
+    if (last.length < 2) { showErr('withdraw-error', 'نام خانوادگی صاحب حساب رو وارد کن'); return; }
+    if (card && card.length !== 16) { showErr('withdraw-error', 'شماره کارت باید ۱۶ رقم باشه (یا خالی بذارش)'); return; }
+    let amount;
+    if (wdMode === 'all') amount = Math.min(wdBalance, wdMax);
+    else amount = parseInt(toLatinDigits(document.getElementById('withdraw-amount').value));
+    if (!amount || amount <= 0) { showErr('withdraw-error', 'مبلغ برداشت رو وارد کن'); return; }
+    if (amount > wdBalance) { showErr('withdraw-error', 'مبلغ نمی‌تونه از موجودیت (' + wdBalance.toLocaleString() + ' تومان) بیشتر باشه'); return; }
+    if (amount > wdMax) { showErr('withdraw-error', 'سقف هر برداشت ' + wdMax.toLocaleString() + ' تومانه'); return; }
+    if (amount < wdMin && amount !== wdBalance) { showErr('withdraw-error', 'حداقل مبلغ برداشت ' + wdMin.toLocaleString() + ' تومانه (یا برداشت کل موجودی)'); return; }
+    const { error } = await sb.rpc('request_withdrawal', { p_amount: amount, p_card: card, p_sheba: sheba, p_first_name: first, p_last_name: last, p_suffix: suffix });
     if (error) { showErr('withdraw-error', error.message || 'خطا در ثبت درخواست برداشت'); return; }
     alert('✅ درخواست برداشت ثبت شد!\nمبلغ تا ۲۴ ساعت به کارت واریز میشه.');
     hideWithdrawModal();
-    loadAdminWallet();
+    if (currentRole === 'admin') loadAdminWallet(); else loadWallet();
   }
 
   // ===== خروج =====
   async function logout() {
     if (!confirm('مطمئنی می‌خوای خارج بشی؟')) return;
     await sb.auth.signOut();
+    clearProjectDraft();
     currentUser = null;
     currentRole = null;
     showPage('landing');
