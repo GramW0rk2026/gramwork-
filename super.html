@@ -1086,22 +1086,46 @@
     loadTransactions();
   }
 
+  // کپی در کلیپ‌بورد (برای کپی دقیق شبا/نام/مبلغ تو همراه بانک)
+  function copyText(text, btn) {
+    const done = () => { if (btn) { const old = btn.textContent; btn.textContent = '✓ کپی شد'; setTimeout(() => { btn.textContent = old; }, 1200); } };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+    } else fallbackCopy(text, done);
+  }
+  function fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    done();
+  }
+
   function showWithdrawModal() {
     const pending = allTx.filter(t => t.type === 'withdraw' && t.status === 'pending');
     const list = document.getElementById('withdraw-list');
     if (!list) return;
     if (!pending.length) { list.innerHTML = '<div style="text-align:center;padding:20px;color:#4a3828;font-size:13px">هیچ درخواستی وجود ندارد</div>'; }
     else {
-      list.innerHTML = pending.map(t => `
-        <div class="withdraw-item">
-          <div>
-            <div class="withdraw-name">${escapeHtml(t.user?.full_name || '-')}</div>
-            <div class="withdraw-meta" style="direction:ltr;text-align:right">${escapeHtml(t.card_number || '-')}</div>
+      const copyBtn = 'background:#2d1f10;color:#e8956d;border:none;border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;flex-shrink:0';
+      const row = 'display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #2d1f1033';
+      list.innerHTML = pending.map(t => {
+        const fullName = [t.holder_first_name, t.holder_last_name, t.holder_suffix].filter(Boolean).join(' ');
+        const amountRaw = String(Math.round(Number(t.amount || 0)));
+        return `
+        <div class="withdraw-item" style="display:block">
+          <div class="withdraw-name" style="margin-bottom:6px">👤 ${escapeHtml(t.user?.full_name || '-')}</div>
+          <div style="${row}"><div><div class="withdraw-meta">نام صاحب حساب</div><div style="font-size:13px;color:#f0e6d3">${escapeHtml(fullName || '-')}</div></div>${fullName ? `<button style="${copyBtn}" data-copy="${escapeHtml(fullName)}" onclick="copyText(this.dataset.copy,this)">کپی</button>` : ''}</div>
+          <div style="${row}"><div><div class="withdraw-meta">شبا</div><div style="font-size:13px;color:#f0e6d3;direction:ltr;text-align:right">${escapeHtml(t.sheba || '-')}</div></div>${t.sheba ? `<button style="${copyBtn}" data-copy="${escapeHtml(t.sheba)}" onclick="copyText(this.dataset.copy,this)">کپی</button>` : ''}</div>
+          ${t.card_number ? `<div style="${row}"><div><div class="withdraw-meta">کارت</div><div style="font-size:13px;color:#f0e6d3;direction:ltr;text-align:right">${escapeHtml(t.card_number)}</div></div><button style="${copyBtn}" data-copy="${escapeHtml(t.card_number)}" onclick="copyText(this.dataset.copy,this)">کپی</button></div>` : ''}
+          <div style="${row};border-bottom:none"><div><div class="withdraw-meta">مبلغ (تومان)</div><div style="font-size:15px;color:#e8956d;font-weight:700">${Number(t.amount || 0).toLocaleString()}</div></div><button style="${copyBtn}" data-copy="${amountRaw}" onclick="copyText(this.dataset.copy,this)">کپی عدد</button></div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="withdraw-pay-btn" style="flex:1" onclick="payWithdraw('${t.id}')">✅ واریز شد</button>
+            <button class="withdraw-pay-btn" style="background:#4a1e1e;color:#e86d6d" onclick="rejectWithdraw('${t.id}')">رد</button>
           </div>
-          <div class="withdraw-amount">${Number(t.amount || 0).toLocaleString()} ت</div>
-          <button class="withdraw-pay-btn" onclick="payWithdraw('${t.id}')">پرداخت</button>
-          <button class="withdraw-pay-btn" style="background:#4a1e1e;color:#e86d6d;margin-right:6px" onclick="rejectWithdraw('${t.id}')">رد</button>
-        </div>`).join('');
+        </div>`;
+      }).join('');
     }
     document.getElementById('withdraw-modal').classList.add('show');
   }
