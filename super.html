@@ -423,14 +423,19 @@
       </div>
     </div>
     <div class="withdraw-alert">
+      <div class="withdraw-alert-text">درخواست‌های شارژ منتظر تایید: <b id="charge-count">۰</b></div>
+      <button class="withdraw-alert-btn" onclick="openPendingTx('charge')">بررسی</button>
+    </div>
+    <div class="withdraw-alert">
       <div class="withdraw-alert-text">درخواست‌های برداشت: <b id="withdraw-count">۰</b></div>
       <button class="withdraw-alert-btn" onclick="showWithdrawModal()">پردازش</button>
     </div>
     <div class="filters">
-      <button class="filter-btn active" onclick="filterTx('all',this)">همه</button>
-      <button class="filter-btn" onclick="filterTx('charge',this)">شارژ</button>
-      <button class="filter-btn" onclick="filterTx('locked',this)">قفل شده</button>
-      <button class="filter-btn" onclick="filterTx('withdraw',this)">برداشت</button>
+      <button class="filter-btn active" data-f="all" onclick="filterTx('all',this)">همه</button>
+      <button class="filter-btn" data-f="pending" onclick="filterTx('pending',this)">در انتظار تایید 🔴</button>
+      <button class="filter-btn" data-f="charge" onclick="filterTx('charge',this)">شارژ</button>
+      <button class="filter-btn" data-f="locked" onclick="filterTx('locked',this)">قفل شده</button>
+      <button class="filter-btn" data-f="withdraw" onclick="filterTx('withdraw',this)">برداشت</button>
     </div>
     <div class="section" id="super-tx-list"></div>
   </div>
@@ -780,10 +785,14 @@
     if (txs) {
       const totalAmount = txs.reduce((s, t) => s + (t.amount || 0), 0);
       const pending = txs.filter(t => t.type === 'withdraw' && t.status === 'pending').length;
+      const pendingCharge = txs.filter(t => t.type === 'charge' && t.status === 'pending').length;
+      window.__pendingCharge = pendingCharge;
+      window.__pendingWithdraw = pending;
       setText('s-total-tx', txs.length);
       setText('s-pending-w', pending);
       setText('withdraw-count', pending);
-      setText('m-withdraw-b', pending);
+      setText('charge-count', pendingCharge);
+      setText('m-withdraw-b', pending + pendingCharge);
       setText('m-tx-sub', totalAmount.toLocaleString() + ' تومان این ماه');
       const revenueEl = document.getElementById('super-revenue');
       if (revenueEl) revenueEl.innerHTML = Math.floor(totalAmount * (commission / 100)).toLocaleString() + ' <span>تومان</span>';
@@ -805,10 +814,12 @@
     const alertsEl = document.getElementById('s-alerts');
     if (alertsEl) {
       const alerts = [];
-      if (reports && reports.filter(r => r.status === 'new').length > 0) alerts.push({ icon: '🚨', title: 'گزارش تخلف جدید', desc: reports.filter(r => r.status === 'new').length + ' گزارش در انتظار بررسی', red: true });
-      if (projects && projects.filter(p => p.status === 'dispute').length > 0) alerts.push({ icon: '⚠️', title: 'اختلاف در پروژه', desc: projects.filter(p => p.status === 'dispute').length + ' پروژه نیاز به داوری دارد', red: false });
+      if (window.__pendingCharge > 0) alerts.push({ icon: '💳', title: 'درخواست شارژ منتظر تایید', desc: window.__pendingCharge + ' درخواست شارژ کیف پول — برای دیدن رسید و تایید بزن', red: true, go: "openPendingTx('charge')" });
+      if (window.__pendingWithdraw > 0) alerts.push({ icon: '💸', title: 'درخواست برداشت منتظر پرداخت', desc: window.__pendingWithdraw + ' درخواست برداشت', red: true, go: "openPendingTx('withdraw')" });
+      if (reports && reports.filter(r => r.status === 'new').length > 0) alerts.push({ icon: '🚨', title: 'گزارش تخلف جدید', desc: reports.filter(r => r.status === 'new').length + ' گزارش در انتظار بررسی', red: true, go: "showSuperPage('reports')" });
+      if (projects && projects.filter(p => p.status === 'dispute').length > 0) alerts.push({ icon: '⚠️', title: 'اختلاف در پروژه', desc: projects.filter(p => p.status === 'dispute').length + ' پروژه نیاز به داوری دارد', red: false, go: "showSuperPage('projects')" });
       if (!alerts.length) { alertsEl.innerHTML = '<div style="text-align:center;padding:20px;color:#4a3828;font-size:13px">هیچ هشداری وجود ندارد ✅</div>'; }
-      else { alertsEl.innerHTML = alerts.map(a => `<div class="alert-card ${a.red ? 'red' : ''}" onclick="showSuperPage('${a.red ? 'reports' : 'projects'}')"><div class="alert-icon">${a.icon}</div><div><div class="alert-title">${a.title}</div><div class="alert-desc">${a.desc}</div></div></div>`).join(''); }
+      else { alertsEl.innerHTML = alerts.map(a => `<div class="alert-card ${a.red ? 'red' : ''}" onclick="${a.go}"><div class="alert-icon">${a.icon}</div><div><div class="alert-title">${a.title}</div><div class="alert-desc">${a.desc}</div></div></div>`).join(''); }
     }
 
     // آخرین فعالیت‌ها
@@ -1014,6 +1025,7 @@
     allTx = data || [];
     const pending = allTx.filter(t => t.type === 'withdraw' && t.status === 'pending');
     setText('withdraw-count', pending.length);
+    setText('charge-count', allTx.filter(t => t.type === 'charge' && t.status === 'pending').length);
     const totalAmount = allTx.reduce((s, t) => s + (t.amount || 0), 0);
     const txRevEl = document.getElementById('tx-revenue');
     if (txRevEl) txRevEl.innerHTML = Math.floor(totalAmount * 0.1).toLocaleString() + ' <span>تومان</span>';
@@ -1025,8 +1037,11 @@
   function renderTx() {
     const list = document.getElementById('super-tx-list');
     if (!list) return;
-    const filtered = txFilter === 'all' ? allTx : allTx.filter(t => t.type === txFilter);
-    if (!filtered.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">تراکنشی پیدا نشد</div>'; return; }
+    document.querySelectorAll('#page-super-transactions .filter-btn').forEach(b => b.classList.toggle('active', b.dataset.f === txFilter));
+    const filtered = txFilter === 'all' ? allTx
+      : txFilter === 'pending' ? allTx.filter(t => t.status === 'pending')
+      : allTx.filter(t => t.type === txFilter);
+    if (!filtered.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">' + (txFilter === 'pending' ? 'درخواست منتظر تاییدی نداری ✅' : 'تراکنشی پیدا نشد') + '</div>'; return; }
     const iconMap = { charge: '💰', locked: '🔒', withdraw: '📤', commission: '💎' };
     list.innerHTML = filtered.map(t => `
       <div class="tx-card">
@@ -1065,9 +1080,14 @@
 
   function filterTx(type, btn) {
     txFilter = type;
-    document.querySelectorAll('#page-super-transactions .filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
     renderTx();
+  }
+
+  // از هشدار داشبورد یا نوار بالای صفحه: مستقیم برو سراغ درخواست‌های منتظر تایید
+  function openPendingTx(kind) {
+    if (kind === 'withdraw') { showSuperPage('transactions'); setTimeout(showWithdrawModal, 600); return; }
+    txFilter = 'pending';
+    showSuperPage('transactions');
   }
 
   async function releaseTx(projectId) {
@@ -1388,6 +1408,9 @@
     showSuperPage('dashboard');
     loadDashboardData();
   }
+
+  // داشبورد هر ۴۵ ثانیه خودش رو تازه می‌کنه تا درخواست‌های جدید شارژ/برداشت از دست نره
+  setInterval(() => { if (currentSuperPage === 'dashboard') loadDashboardData(); }, 45000);
 
   // ===== init =====
   window.addEventListener('load', async () => {
