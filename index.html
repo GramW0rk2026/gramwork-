@@ -1456,7 +1456,7 @@
     list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">در حال بارگذاری...</div>';
 
     if (exploreMode === 'employer') {
-      const { data } = await sb.from('users').select('*').eq('role', 'admin').eq('banned', false).order('rating', { ascending: false }).limit(20);
+      const { data } = await sb.from('users').select('id,full_name,verified,rating').eq('role', 'admin').eq('banned', false).order('rating', { ascending: false }).limit(20);
       if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--faint);font-size:13px">هنوز ادمینی ثبت‌نام نکرده</div>'; return; }
       list.innerHTML = data.map(a => `
         <div class="available-card">
@@ -1515,6 +1515,7 @@
 
   // شماره موبایل رو به یه ایمیل ساختگی تبدیل می‌کنه تا بشه از خود Supabase Auth
   // (همون سیستمی که سوپرادمین باهاش وارد می‌شه) برای کاربرای عادی هم استفاده کرد.
+  const PROFILE_COLS = 'id,full_name,role,verified,banned,rating,created_at,auth_uid';
   function phoneToEmail(phone) { return phone + '@gramwork.ir'; }
 
   // فقط برای انتقال بین «فرم ثبت‌نام» و «تأیید OTP» در همون تب مرورگر — رمز
@@ -1546,7 +1547,7 @@
       showErr('login-error', 'شماره یا رمز اشتباهه — یا هنوز رمزی نساختی، از گزینه‌ی «با کد تأیید وارد شو» استفاده کن');
       return;
     }
-    const { data: profile } = await sb.from('users').select('*').eq('auth_uid', data.user.id).maybeSingle();
+    const { data: profile } = await sb.from('users').select(PROFILE_COLS).eq('auth_uid', data.user.id).maybeSingle();
     showLoad('login-loading', false);
     if (!profile) { showErr('login-error', 'حساب کاربری پیدا نشد'); await sb.auth.signOut(); return; }
     if (profile.banned) { showErr('login-error', 'حساب شما مسدود شده'); await sb.auth.signOut(); return; }
@@ -1581,11 +1582,13 @@
       if (!name) { showLoad('login-loading', false); showErr('login-error', 'نام و نام خانوادگی رو وارد کن'); return; }
       if (!pass || pass.length < 6) { showLoad('login-loading', false); showErr('login-error', 'رمز عبور باید حداقل ۶ کاراکتر باشه'); return; }
       if (pass !== pass2) { showLoad('login-loading', false); showErr('login-error', 'تکرار رمز عبور یکی نیست'); return; }
-      const { data: ex } = await sb.from('users').select('id').eq('phone', phone).maybeSingle();
+      const { data: stReg } = await sb.rpc('phone_status', { p_phone: phone });
+      const ex = stReg && stReg[0] && stReg[0].registered;
       if (ex) { showLoad('login-loading', false); showErr('login-error', 'این شماره قبلاً ثبت‌نام کرده — از تب ورود وارد شو'); return; }
       pendingAuth = { type: 'register', phone, name, role: selectedRole, password: pass };
     } else {
-      const { data: user } = await sb.from('users').select('id,banned').eq('phone', phone).maybeSingle();
+      const { data: stAcc } = await sb.rpc('phone_status', { p_phone: phone });
+      const user = (stAcc && stAcc[0] && stAcc[0].registered) ? { banned: stAcc[0].banned } : null;
       if (!user) { showLoad('login-loading', false); showErr('login-error', 'این شماره ثبت‌نام نشده — از تب ثبت‌نام اقدام کن'); return; }
       if (user.banned) { showLoad('login-loading', false); showErr('login-error', 'حساب شما مسدود شده'); return; }
       pendingAuth = { type: 'access', phone };
@@ -1663,7 +1666,7 @@
       if (!authData) { showLoad('otp-loading', false); showErr('otp-error', 'خطا در ساخت حساب — دوباره تلاش کن'); return; }
       const { data: newUser, error: insErr } = await sb.from('users').insert({
         phone: pendingAuth.phone, full_name: pendingAuth.name, role: pendingAuth.role, auth_uid: authData.user.id
-      }).select().single();
+      }).select(PROFILE_COLS).single();
       if (insErr) { showLoad('otp-loading', false); showErr('otp-error', 'خطا در ساخت پروفایل — دوباره تلاش کن'); return; }
       await sb.from('wallets').insert({ user_id: newUser.id });
       showLoad('otp-loading', false);
@@ -1705,7 +1708,7 @@
       if (signUpData) {
         const { error: linkErr } = await sb.rpc('link_existing_account', { p_phone: phone });
         if (linkErr) { showLoad('otp-loading', false); showErr('otp-error', 'خطا در وصل کردن حساب — دوباره تلاش کن'); return; }
-        const { data: profile } = await sb.from('users').select('*').eq('auth_uid', signUpData.user.id).maybeSingle();
+        const { data: profile } = await sb.from('users').select(PROFILE_COLS).eq('auth_uid', signUpData.user.id).maybeSingle();
         showLoad('otp-loading', false);
         pendingAuth = null;
         if (profile) enterAsUser(profile);
@@ -1719,7 +1722,7 @@
     const { data: signInData, error: signInErr } = await sb.auth.signInWithPassword({ email, password: pass });
     showLoad('otp-loading', false);
     if (signInErr || !signInData.session) { showErr('otp-error', 'رمز عوض شد ولی ورود ناموفق بود — از صفحه‌ی ورود دوباره امتحان کن'); return; }
-    const { data: profile } = await sb.from('users').select('*').eq('auth_uid', signInData.user.id).maybeSingle();
+    const { data: profile } = await sb.from('users').select(PROFILE_COLS).eq('auth_uid', signInData.user.id).maybeSingle();
     pendingAuth = null;
     if (profile) enterAsUser(profile);
   }
@@ -2103,12 +2106,36 @@
     return d.innerHTML;
   }
 
-  // فقط لینک‌های http/https رو معتبر می‌دونه، تا کسی نتونه با یه لینک
-  // «javascript:» به‌جای آدرس فایل، کد اجرا کنه.
+  // لینک فقط وقتی معتبره که http/https باشه و هیچ کاراکتر خطرناکی (نقل‌قول، <، >، فاصله) نداشته باشه
   function safeUrl(u) {
-    if (typeof u === 'string' && /^https?:\/\//i.test(u)) return u;
+    if (typeof u === 'string' && /^https?:\/\/[^\s"'<>`]+$/i.test(u)) return u;
     return '#';
   }
+
+  // برای گذاشتن مقدار داخل attribute (مثلاً data-path="...") — نقل‌قول‌ها هم escape می‌شن
+  function escapeAttr(str) {
+    return escapeHtml(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // عکس‌های آپلودشده (رسید واریز / پشتیبانی) خصوصی‌اند: فقط با لینک امضاشده‌ی موقت دیده می‌شن
+  async function signedImageUrl(urlOrPath) {
+    const raw = String(urlOrPath || '');
+    const m = raw.match(/uploads\/(.+?)(?:\?|$)/);
+    const path = m ? decodeURIComponent(m[1]) : raw;
+    const { data, error } = await sb.storage.from('uploads').createSignedUrl(path, 3600);
+    return (error || !data) ? null : data.signedUrl;
+  }
+
+  function hydrateImages(root) {
+    (root || document).querySelectorAll('img[data-path]').forEach(async img => {
+      if (img.dataset.done) return;
+      img.dataset.done = '1';
+      const u = await signedImageUrl(img.dataset.path);
+      if (u) img.src = u; else img.alt = 'عکس در دسترس نیست';
+    });
+  }
+
+  const IMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 
   function msgBubbleHTML(m) {
     const mine = m.sender_id === currentUser.id;
@@ -2599,7 +2626,7 @@
     const mine = m.sender_role === 'user';
     const time = new Date(m.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
     const body = m.image_link
-      ? `<img src="${m.image_link}" style="max-width:180px;border-radius:12px;display:block;cursor:pointer" onclick="window.open('${m.image_link}','_blank')" />`
+      ? `<img data-path="${escapeAttr(m.image_link)}" src="${IMG_PLACEHOLDER}" alt="" style="max-width:180px;min-height:40px;border-radius:12px;display:block;cursor:pointer" onclick="if(this.dataset.done&&this.src.indexOf('data:')!==0)window.open(this.src,'_blank')" />`
       : escapeHtml(m.content || '');
     return `<div class="message ${mine ? 'sent' : 'received'}"><div><div class="msg-bubble">${body}</div><div class="msg-time">${time}</div></div></div>`;
   }
@@ -2613,6 +2640,7 @@
       box.innerHTML = '<div class="system-msg">سلام! هر سوالی داری همینجا بپرس 🎧</div>';
     } else {
       box.innerHTML = msgs.map(supportBubbleHTML).join('');
+      hydrateImages(box);
     }
     box.scrollTop = box.scrollHeight;
 
@@ -2621,6 +2649,7 @@
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages', filter: `user_id=eq.${currentUser.id}` }, payload => {
         if (payload.new.sender_role === 'user') return; // خودمون قبلاً نشون دادیم
         box.insertAdjacentHTML('beforeend', supportBubbleHTML(payload.new));
+        hydrateImages(box);
         box.scrollTop = box.scrollHeight;
       })
       .subscribe();
@@ -2649,6 +2678,7 @@
     await sb.from('support_messages').insert({ user_id: currentUser.id, sender_role: 'user', image_link: urlData.publicUrl });
     const box = document.getElementById('support-messages');
     box.insertAdjacentHTML('beforeend', supportBubbleHTML({ sender_role: 'user', image_link: urlData.publicUrl, created_at: new Date().toISOString() }));
+    hydrateImages(box);
     box.scrollTop = box.scrollHeight;
     fileInput.value = '';
   }
@@ -2840,7 +2870,7 @@
     applyTheme(currentThemeId());
     const { data } = await sb.auth.getSession();
     if (!data.session) return;
-    const { data: profile } = await sb.from('users').select('*').eq('auth_uid', data.session.user.id).maybeSingle();
+    const { data: profile } = await sb.from('users').select(PROFILE_COLS).eq('auth_uid', data.session.user.id).maybeSingle();
     if (profile && !profile.banned) enterAsUser(profile);
   });
 </script>

@@ -692,10 +692,36 @@
     d.textContent = (str === null || str === undefined) ? '' : String(str);
     return d.innerHTML;
   }
+  // لینک فقط وقتی معتبره که http/https باشه و هیچ کاراکتر خطرناکی (نقل‌قول، <، >، فاصله) نداشته باشه
   function safeUrl(u) {
-    if (typeof u === 'string' && /^https?:\/\//i.test(u)) return u;
+    if (typeof u === 'string' && /^https?:\/\/[^\s"'<>`]+$/i.test(u)) return u;
     return '#';
   }
+
+  // برای گذاشتن مقدار داخل attribute (مثلاً data-path="...") — نقل‌قول‌ها هم escape می‌شن
+  function escapeAttr(str) {
+    return escapeHtml(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // عکس‌های آپلودشده (رسید واریز / پشتیبانی) خصوصی‌اند: فقط با لینک امضاشده‌ی موقت دیده می‌شن
+  async function signedImageUrl(urlOrPath) {
+    const raw = String(urlOrPath || '');
+    const m = raw.match(/uploads\/(.+?)(?:\?|$)/);
+    const path = m ? decodeURIComponent(m[1]) : raw;
+    const { data, error } = await sb.storage.from('uploads').createSignedUrl(path, 3600);
+    return (error || !data) ? null : data.signedUrl;
+  }
+
+  function hydrateImages(root) {
+    (root || document).querySelectorAll('img[data-path]').forEach(async img => {
+      if (img.dataset.done) return;
+      img.dataset.done = '1';
+      const u = await signedImageUrl(img.dataset.path);
+      if (u) img.src = u; else img.alt = 'عکس در دسترس نیست';
+    });
+  }
+
+  const IMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 
   // ===== لاگین (Supabase Auth واقعی — رمز دیگه توی کد نیست) =====
   async function superLogin() {
@@ -842,7 +868,7 @@
 
   // ===== کاربران =====
   async function loadUsers() {
-    const { data } = await sb.from('users').select('*').order('created_at', { ascending: false });
+    const { data } = await sb.rpc('superadmin_list_users');
     allUsers = data || [];
     renderUsers();
   }
@@ -1056,10 +1082,11 @@
           <div class="tx-amount ${t.type === 'charge' ? 'amount-plus' : t.type === 'locked' ? 'amount-locked' : 'amount-minus'}">${t.type === 'charge' ? '+' : '-'}${Number(t.amount || 0).toLocaleString()}</div>
         </div>
         <div class="tx-date">${new Date(t.created_at).toLocaleDateString('fa-IR')}</div>
-        ${t.type === 'charge' && t.status === 'pending' && t.receipt_link ? `<div style="margin-top:8px"><img src="${t.receipt_link}" style="width:100%;max-width:220px;border-radius:10px;border:1px solid #2d1f10;cursor:pointer" onclick="window.open('${t.receipt_link}','_blank')" /></div>` : ''}
+        ${t.type === 'charge' && t.status === 'pending' && t.receipt_link ? `<div style="margin-top:8px"><img data-path="${escapeAttr(t.receipt_link)}" src="${IMG_PLACEHOLDER}" alt="" style="width:100%;max-width:220px;min-height:40px;border-radius:10px;border:1px solid #2d1f10;cursor:pointer" onclick="if(this.dataset.done&&this.src.indexOf('data:')!==0)window.open(this.src,'_blank')" /></div>` : ''}
         ${t.type === 'charge' && t.status === 'pending' ? `<div style="display:flex;gap:8px;margin-top:8px"><button class="action-btn" style="background:#2d4a1e;color:#7bc67e" onclick="approveCharge('${t.id}','${t.user_id}',${t.amount})">✅ تایید و شارژ کیف‌پول</button><button class="action-btn" style="background:#4a1e1e;color:#e86d6d" onclick="rejectCharge('${t.id}')">❌ رد درخواست</button></div>` : ''}
         ${t.type === 'locked' ? `<div style="display:flex;gap:8px;margin-top:8px"><button class="action-btn" style="background:#1e3a4a;color:#6db8e8" onclick="releaseTx('${t.project_id}')">💰 آزادسازی</button><button class="action-btn" style="background:#4a1e1e;color:#e86d6d" onclick="refundTx('${t.project_id}')">↩️ برگشت وجه</button></div>` : ''}
       </div>`).join('');
+    hydrateImages(list);
   }
 
   async function approveCharge(txId, userId, amount) {
@@ -1247,10 +1274,14 @@
   let supportThreadChannel = null;
 
   async function loadSupportInbox() {
-    const { data: msgs } = await sb.from('support_messages').select('*, user:user_id(full_name, phone)').order('created_at', { ascending: false });
+    const { data: msgs } = await sb.from('support_messages').select('*, user:user_id(full_name)').order('created_at', { ascending: false });
     const list = document.getElementById('support-inbox-list');
     if (!list) return;
     if (!msgs || !msgs.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#4a3828;font-size:13px">هنوز پیامی نیست</div>'; setText('m-support-sub', 'هنوز پیامی نیست'); setText('m-support-b', '۰'); return; }
+
+    const { data: ul } = await sb.rpc('superadmin_list_users');
+    const phoneById = {};
+    (ul || []).forEach(u => { phoneById[u.id] = u.phone; });
 
     const byUser = {};
     for (const m of msgs) {
@@ -1269,7 +1300,7 @@
           <div class="avatar">👤</div>
           <div style="flex:1">
             <div class="user-name">${escapeHtml(t.user?.full_name || 'کاربر')}</div>
-            <div class="user-meta">${escapeHtml(t.user?.phone || '')}</div>
+            <div class="user-meta">${escapeHtml(phoneById[t.uid] || '')}</div>
             <div style="font-size:12px;color:#8a7060;margin-top:4px">${t.last.sender_role === 'user' ? '🔴 ' : ''}${t.last.image_link ? '📎 عکس' : escapeHtml((t.last.content || '').substring(0, 40))}</div>
           </div>
         </div>
@@ -1282,7 +1313,7 @@
     const mine = m.sender_role !== 'user';
     const time = new Date(m.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
     const body = m.image_link
-      ? `<img src="${safeUrl(m.image_link)}" style="max-width:180px;border-radius:10px;display:block;cursor:pointer" onclick="window.open(this.src,'_blank')" />`
+      ? `<img data-path="${escapeAttr(m.image_link)}" src="${IMG_PLACEHOLDER}" alt="" style="max-width:180px;min-height:40px;border-radius:10px;display:block;cursor:pointer" onclick="if(this.dataset.done&&this.src.indexOf('data:')!==0)window.open(this.src,'_blank')" />`
       : escapeHtml(m.content || '');
     return `<div class="chat-msg"><div class="chat-msg-sender">${mine ? 'سوپرادمین' : 'کاربر'} — ${time}</div><div class="chat-msg-bubble ${mine ? 'msg-super' : 'msg-other'}">${body}</div></div>`;
   }
@@ -1294,6 +1325,7 @@
     const { data: msgs } = await sb.from('support_messages').select('*').eq('user_id', userId).order('created_at', { ascending: true });
     const box = document.getElementById('support-thread-msgs');
     box.innerHTML = (msgs || []).map(supportMsgHTML).join('');
+    hydrateImages(box);
     box.scrollTop = box.scrollHeight;
     document.getElementById('support-thread-panel').classList.add('show');
 
@@ -1302,6 +1334,7 @@
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages', filter: `user_id=eq.${userId}` }, payload => {
         if (payload.new.sender_role !== 'user') return;
         box.insertAdjacentHTML('beforeend', supportMsgHTML(payload.new));
+        hydrateImages(box);
         box.scrollTop = box.scrollHeight;
       })
       .subscribe();
